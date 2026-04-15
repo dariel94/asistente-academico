@@ -1,0 +1,296 @@
+Plan de Implementacion — Asistente Virtual Academico Modular
+                                                                                                             
+     Contexto
+                                                                                                             
+     Se debe implementar desde cero el sistema descrito en TECNICAL_SPEC.md: un asistente virtual academico
+     que integra un LLM local (Llama 3.1 8B via Ollama) con datos academicos en PostgreSQL y documentos    
+     institucionales via RAG. El proyecto es greenfield (solo existe la spec y la tesis).
+
+     El plan organiza el trabajo en 8 fases secuenciales con dependencias claras. Cada fase produce un
+     entregable verificable antes de avanzar a la siguiente.
+
+     ---
+     Fase 1: Infraestructura y base de datos
+
+     Objetivo: Tener PostgreSQL + pgvector corriendo con el esquema completo y datos de prueba.
+
+     Archivos a crear:
+     - db/01_schema.sql — DDL completo (tablas §3.1–3.5, tabla vectorial §4.1, indices §3.4, indice HNSW
+     §4.1)
+     - db/02_seed.sql — Datos de prueba: 1 carrera, ~10 materias con correlativas, 2 alumnos con historia
+     academica, comisiones, horarios, inscripciones
+
+     Tareas:
+     1. Escribir 01_schema.sql con todas las tablas en orden de dependencia (carreras → alumnos → materias →
+     correlativas → comisiones → horarios → inscripciones → historia_academica → conversaciones → resumenes →
+      documentos_fragmentos)
+     2. Incluir extension CREATE EXTENSION IF NOT EXISTS vector
+     3. Incluir todos los indices (§3.4 + HNSW §4.1)
+     4. Escribir 02_seed.sql con datos realistas para testing
+     5. Passwords de seed hasheados con bcrypt (precomputar hash para password conocido, ej. "password123")
+
+     Verificacion: Ejecutar ambos scripts contra PostgreSQL local y verificar que no hay errores. Consultar
+     tablas para confirmar datos.
+
+     ---
+     Fase 2: Scaffolding del backend + configuracion
+
+     Objetivo: Proyecto Python funcional con FastAPI corriendo en :8000, pool de DB conectado, configuracion
+     centralizada.
+
+     Archivos a crear:
+     - requirements.txt — dependencias: fastapi, uvicorn, asyncpg, pyjwt, bcrypt, httpx (para Ollama)
+     - .env — variables de entorno (§2.1)
+     - app/__init__.py
+     - app/config.py — carga de env vars con valores por defecto
+     - app/main.py — FastAPI app con CORS (§1.2), lifespan (pool asyncpg), include routers
+     - app/routers/__init__.py
+     - app/services/__init__.py
+     - app/mcp/__init__.py
+     - app/models/__init__.py
+     - app/models/schemas.py — modelos Pydantic (LoginRequest, LoginResponse, ChatRequest, Perfil,
+     SessionContext)
+
+     Tareas:
+     1. Crear estructura de directorios
+     2. Implementar config.py con las 5 variables de entorno
+     3. Implementar main.py con lifespan (crear/cerrar pool asyncpg), CORS middleware
+     4. Implementar schemas.py con todos los modelos Pydantic
+     5. Crear requirements.txt
+     6. Crear .env con valores locales
+
+     Verificacion: uvicorn app.main:app --port 8000 arranca sin errores, pool se conecta a DB.
+
+     ---
+     Fase 3: Autenticacion (JWT + login)
+
+     Objetivo: Endpoint de login funcional que valida credenciales y emite JWT. Dependencia de auth para
+     proteger endpoints.
+
+     Archivos a crear:
+     - app/routers/auth.py — POST /api/auth/login (§7.3.1)
+     - app/services/auth.py — funciones JWT (encode/decode), verificacion bcrypt, dependencia
+     get_current_user
+
+     Tareas:
+     1. Implementar create_token(id_alumno) → JWT HS256 con exp 24h
+     2. Implementar verify_token(token) → id_alumno o excepcion
+     3. Implementar dependencia FastAPI get_current_user que extrae JWT del header Authorization, lo valida,
+     consulta perfil del alumno en DB, y retorna SessionContext
+     4. Implementar POST /api/auth/login: validar legajo+password contra DB con bcrypt, limpiar conversaciones
+     y resumenes previos del alumno (cada sesion inicia con contexto limpio), retornar JWT + perfil
+     5. Registrar router en main.py
+
+     Verificacion: curl POST /api/auth/login con credenciales de seed retorna JWT. Request con JWT invalido
+     retorna 401.
+
+     ---
+     Fase 4: Capa MCP — Herramientas de datos
+
+     Objetivo: Las 7 herramientas MCP implementadas y testeables de forma aislada.
+
+     Archivos a crear:
+     - app/mcp/server.py — clase MCPServer, registro de herramientas, dispatch, TOOLS_CATALOG
+     - app/mcp/tools.py — implementacion de las 7 herramientas (§5.4.1–5.4.7)
+
+     Tareas:
+     1. Implementar periodo_vigente() como funcion utilitaria (§5.1)
+     2. Implementar MCPServer con:
+       - registro de herramientas
+       - metodo has(name) para verificar existencia (usado por el orquestador para filtrar tool calls
+     alucinadas)
+       - metodo dispatch(tool_name, args, ctx) que ejecuta la herramienta inyectando el SessionContext
+     3. Implementar obtener_historia_academica(ctx) — query parametrizada con JOIN materias+carreras, ORDER
+     BY fecha DESC
+     4. Implementar obtener_materia(ctx, nombre_materia) — ILIKE parcial filtrado por carrera del alumno, con
+      correlativas y comisiones+horarios
+     5. Implementar obtener_inscripciones(ctx) — JOIN inscripciones+comisiones+horarios filtrado por
+     periodo_vigente(). Cubre consultas sobre agenda, horarios e inscripciones vigentes
+     6. Implementar consultar_materias_disponibles(ctx) — logica de correlativas cumplidas (§5.4.4), la query
+      mas compleja. SOLO materias inscribibles (correlativas cumplidas, no inscriptas, no aprobadas)
+     7. Implementar buscar_en_documentos(ctx, consulta_semantica) — generar embedding via Ollama, query
+     vectorial con threshold 0.75, LIMIT 5
+     8. Implementar obtener_plan_de_estudios(ctx) — lista completa de materias de la carrera del alumno
+     9. Implementar obtener_materias_faltantes(ctx) — cruza plan con historia academica; devuelve materias
+     pendientes (no aprobadas ni promocionadas) + total_plan + aprobadas + faltantes +
+     porcentaje_completado calculado en SQL. El calculo se hace en la tool para evitar errores aritmeticos
+     del modelo 8B
+     10. Cada herramienta retorna mensaje controlado si no hay resultados
+     11. Generar el catalogo de tools (TOOLS_CATALOG) en formato OpenAI para pasarle a Ollama. Las
+     descripciones deben desambiguar entre tools similares (ej. consultar_materias_disponibles vs
+     obtener_materias_faltantes)
+
+     Verificacion: Llamar cada herramienta directamente con un SessionContext de prueba y verificar
+     resultados contra datos de seed.
+
+     ---
+     Fase 5: Orquestacion del agente + memoria
+
+     Objetivo: El ciclo completo de inferencia funcional: prompt → Ollama → tool calling → respuesta.
+
+     Archivos a crear:
+     - app/services/agent.py — orquestador del agente (§7.1)
+     - app/services/memory.py — MemoryManager (§7.2)
+
+     Tareas:
+     1. Implementar MemoryManager (memoria por sesion, se limpia al login):
+       - obtener_contexto(id_alumno) → resumen (si existe) + ultimos 10 mensajes de conversaciones
+       - guardar_intercambio(id_alumno, pregunta, respuesta) → INSERT en conversaciones + check umbral
+     sumarizacion (20) + sumarizar si corresponde
+       - Sumarizacion: llamada no-streaming a Ollama con prompt template fijo (§7.2)
+     2. Implementar SYSTEM_PROMPT_TEMPLATE (Selene) con encuadre positivo (§6.3):
+       - Identidad: asistente conversacional amplio (no solo academico) con nombre propio Selene
+       - Inyeccion de perfil + periodo_vigente()
+       - Regla anti-rechazo explicita ("nunca digas 'no puedo responder' a una pregunta simple")
+       - Directiva positiva para invocar tools en consultas academicas
+       - Separacion de conversacion general (sin tools)
+       - Restricciones duras al final
+       - NO enumerar el catalogo de tools en el prompt (va en el parametro tools de la API)
+     3. Implementar AgentOrchestrator (pipeline defensivo contra patologias de Llama 3.1 8B):
+       - Constantes: MAX_TOOL_CALLS = 3, FALLBACK_REFORMULAR (mensaje fijo para cuando el modelo persiste
+     emitiendo JSON)
+       - Helper _looks_like_tool_call(text): detecta contenido que empieza con "{" y contiene '"name"'
+       - Construir system prompt + memoria + mensaje actual
+       - Llamada 1 (no-streaming) a Ollama CON tools
+       - Filtrar tool_calls invalidas via mcp.has(name) — Llama 3.1 8B a veces inventa nombres
+       - Si no quedan tool calls validas Y (content vacio OR había tool calls invalidas OR
+     _looks_like_tool_call(content)) → Reintentar sin tools
+       - Red de seguridad: si el reintento todavia devuelve contenido vacio o con forma de tool call,
+     reemplazar por FALLBACK_REFORMULAR
+       - Si hay tool_calls validas: ejecutar secuencialmente via MCPServer (max 3), emitir eventos de estado,
+     reinyectar resultados como role=tool
+       - Llamada final (streaming) a Ollama si hubo tools, sino usar content ya obtenido → yield chunks
+       - Manejo de errores de Ollama (timeout, conexion)
+     4. Implementar cliente HTTP para Ollama (httpx async): chat/completions y embeddings
+       - Todas las llamadas deben incluir web_search: false para deshabilitar busqueda web de Ollama
+
+     Verificacion: Invocar el orquestador con:
+       - mensaje conversacional ("hola", "1+1") → respuesta natural sin tool calls
+       - mensaje academico ("cuales son mis materias aprobadas?") → ejecuta tool calling correcto
+       - mensaje que induce alucinacion de tools → no se filtra al usuario, llega fallback o respuesta limpia
+
+     ---
+     Fase 6: Endpoint de chat + SSE
+
+     Objetivo: El endpoint /api/chat completo con streaming SSE, rate limiting y protocolo de eventos.
+
+     Archivos a crear:
+     - app/routers/chat.py — POST /api/chat (§7.3.2)
+     - app/services/rate_limit.py — rate limiter en memoria
+
+     Tareas:
+     1. Implementar rate limiter: dict {id_alumno: [timestamps]}, max 10/min, respuesta 429
+     2. Implementar POST /api/chat:
+       - Dependencia get_current_user → SessionContext
+       - Rate limit check
+       - StreamingResponse con media_type="text/event-stream" + headers (Cache-Control, X-Accel-Buffering)
+       - Emitir evento estado procesando
+       - Delegar al AgentOrchestrator (que emite eventos de estado durante tool calling)
+       - Emitir chunks de texto durante streaming
+       - Emitir evento fin al completar
+       - Emitir evento error ante fallos de Ollama
+       - Persistir intercambio via MemoryManager
+     3. Registrar router en main.py
+
+     Verificacion: curl POST /api/chat con JWT valido y un mensaje, verificar que recibe eventos SSE
+     correctos (estado → chunks → fin).
+
+     ---
+     Fase 7: Pipeline de ingestion RAG
+
+     Objetivo: Script funcional que ingesta PDFs en la tabla vectorial.
+
+     Archivos a crear:
+     - scripts/ingest.py — pipeline de ingestion (§4.4)
+     - docs/ — directorio con al menos 1 PDF de prueba
+
+     Tareas:
+     1. Implementar extraccion de texto con PyMuPDF
+     2. Implementar chunking con parametros fijos (800 chars, 200 overlap, separadores jerarquicos §4.2)
+     3. Implementar generacion de embeddings via Ollama (nomic-embed-text)
+     4. Implementar insercion en documentos_fragmentos con re-ingestion (DELETE + INSERT)
+     5. Agregar PyMuPDF a requirements.txt
+     6. Colocar al menos 1 PDF de prueba en docs/
+
+     Verificacion: Ejecutar python scripts/ingest.py, verificar fragmentos en DB, luego probar
+     buscar_en_documentos desde el chat.
+
+     ---
+     Fase 8: Frontend React
+
+     Objetivo: SPA completa con login, chat con streaming y sidebar.
+
+     Archivos a crear (todos bajo frontend/):
+     - package.json, tsconfig.json, vite.config.ts, tailwind.config.js, index.html
+     - src/main.tsx — entry point
+     - src/App.tsx — estado JWT + perfil, AuthGuard
+     - src/types/chat.ts — tipos TypeScript (§8.3)
+     - src/services/api.ts — funciones login() y sendMessage() con fetch + ReadableStream
+     - src/hooks/useChat.ts — useReducer con ChatState/ChatAction, consumo SSE, dispatch de eventos.
+     Inicializa el estado con un mensaje estatico de bienvenida de Selene saludando al alumno por nombre
+     (no consume inferencia)
+     - src/components/AuthGuard.tsx — redireccion condicional
+     - src/components/LoginPage.tsx — form legajo + password
+     - src/components/ChatPage.tsx — layout con Sidebar + ChatWindow
+     - src/components/Sidebar.tsx — perfil del alumno + boton logout
+     - src/components/ChatWindow.tsx — contenedor de MessageList + StatusIndicator + InputBar
+     - src/components/MessageList.tsx — scroll de mensajes
+     - src/components/MessageBubble.tsx — burbuja user/assistant, react-markdown + remark-gfm para
+     tablas y listas en respuestas del assistant
+     - src/components/StatusIndicator.tsx — mapeo estado → etiqueta (§8.4)
+     - src/components/InputBar.tsx — textarea + boton enviar. Solo el BOTON se deshabilita mientras
+     estadoAgente !== 'idle' (el textarea sigue habilitado para redactar en paralelo). useEffect con
+     dependencia vacia para auto-focus en el textarea al montar (tras login)
+
+     Tareas:
+     1. Scaffolding: npm create vite@latest con React + TypeScript, instalar Tailwind + react-markdown
+     2. Implementar tipos (chat.ts)
+     3. Implementar servicio API (api.ts): login + SSE consumer con buffer de frames
+     4. Implementar App.tsx con estado de auth (token + perfil en useState)
+     5. Implementar LoginPage con form y manejo de 401
+     6. Implementar AuthGuard
+     7. Implementar useChat hook: useReducer, funcion enviarMensaje que abre stream, parsea eventos SSE,
+     despacha acciones
+     8. Implementar componentes de chat: ChatPage, ChatWindow, MessageList, MessageBubble, StatusIndicator,
+     InputBar
+     9. Implementar Sidebar con perfil y logout
+     10. Manejo de expiracion de sesion (401 → redirect a login con mensaje)
+     11. Configurar proxy en vite.config.ts para /api → http://localhost:8000 (evita CORS en desarrollo)
+
+     Verificacion: Abrir http://localhost:5173, login con credenciales de seed, verificar:
+       - el mensaje de bienvenida aparece inmediatamente con el nombre del alumno
+       - el cursor esta posicionado en el textarea sin clic adicional
+       - enviar mensaje muestra estados de carga, respuesta streaming con markdown (incluyendo tablas)
+       - durante el streaming, el textarea sigue habilitado pero el boton Enviar esta deshabilitado
+       - sidebar con perfil visible en todo momento
+
+     ---
+     Orden de ejecucion y dependencias
+
+     Fase 1 (DB)
+       └→ Fase 2 (Scaffolding backend)
+            └→ Fase 3 (Auth)
+                 └→ Fase 4 (MCP Tools)
+                      └→ Fase 5 (Agente + Memoria)
+                           └→ Fase 6 (Chat SSE)
+                                └→ Fase 8 (Frontend)
+                      └→ Fase 7 (Ingestion RAG) ← paralela a Fase 5-6
+
+     La Fase 7 (ingestion) puede ejecutarse en paralelo con las fases 5 y 6 ya que solo depende de la DB
+     (Fase 1) y Ollama.
+
+     Prerequisitos del entorno
+
+     Antes de empezar, verificar que estan instalados:
+     - PostgreSQL 16 con extension pgvector
+     - Ollama con modelos llama3.1:8b-instruct-q5_K_M y nomic-embed-text descargados
+     - Python 3.11+
+     - Node.js 20+
+
+     Configuracion del modelo en Ollama:
+     - El num_ctx por defecto de Ollama es 4096 tokens, insuficiente para este sistema.
+       Elevar a 16384 tokens (16k) como compromiso entre consumo de VRAM y espacio para
+       memoria conversacional + resultados de tool calls voluminosos (plan de estudios,
+       historia academica, fragmentos RAG).
+     - Configurar via Modelfile (PARAMETER num_ctx 16384) o pasando options.num_ctx=16384
+       en cada llamada a /api/chat y /api/embeddings desde el cliente httpx (Fase 5).

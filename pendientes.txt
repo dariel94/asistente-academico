@@ -1,0 +1,9 @@
+agregar promps de las tools a la tesis y a la spec
+sacar el punto 5.1. Stack Tecnológico y Entorno de Ejecución de la tesis y llevar esa información a cada capa de la implementación
+llevar sección RAG como trabajo futuro, junto con tablas y extensiones vectoriales, ingesta de pdfs y todo lo relacionado
+armar set de pruebas para el punto 6 y ejecutarlo (con logs de ollama y el backend)
+armar conclusiones
+ver referencias al anexo en tesis.md (hace falta un anexo?)
+
+
+
