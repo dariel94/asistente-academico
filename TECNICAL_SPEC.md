@@ -379,9 +379,9 @@ Las siete herramientas expuestas al modelo. Ningún parámetro de identidad apar
 | `obtener_materia`                | SQL       | `nombre_materia: str`               | Metadatos de la materia, carga horaria, correlativas, comisiones  |
 | `obtener_inscripciones`          | SQL       | _(ninguno — usa `ctx.id_alumno`)_   | Inscripciones vigentes con grilla semanal                         |
 | `consultar_materias_disponibles` | SQL       | _(ninguno — usa `ctx.id_alumno`)_   | Materias habilitadas (correlativas cumplidas) con sus comisiones  |
-| `buscar_en_documentos`           | Vectorial | `consulta_semantica: str`           | Fragmentos relevantes (texto + metadata) del corpus RAG           |
 | `obtener_plan_de_estudios`       | SQL       | _(ninguno — usa `ctx.id_alumno`)_   | Plan completo de la carrera (materias + total)                    |
 | `obtener_materias_faltantes`     | SQL       | _(ninguno — usa `ctx.id_alumno`)_   | Materias pendientes + avance numérico y porcentaje                |
+| `buscar_en_documentos`           | Vectorial | `consulta_semantica: str`           | Fragmentos relevantes (texto + metadata) del corpus RAG           |
 
 #### 5.4.1. `obtener_historia_academica`
 
@@ -462,22 +462,7 @@ Salida : list[{
    - Correlativa tipo `regularizada` → estado del alumno ∈ {`regularizada`, `aprobada`, `promocionada`}.
 4. Orden: `anio_plan`, `cuatrimestre`, `nombre`.
 
-#### 5.4.5. `buscar_en_documentos`
-
-```
-Entrada: { consulta_semantica : str }
-Salida : list[{
-    documento  : str
-    seccion    : str | null
-    contenido  : str
-    distancia  : float       # distancia coseno (menor es mejor)
-    metadata   : object
-}]
-```
-
-Pipeline: `consulta_semantica` → `nomic-embed-text` → búsqueda ANN con `WHERE embedding <=> $1 <= 0.75 ORDER BY embedding <=> $1 LIMIT 5`. Fragmentos con distancia coseno > 0.75 se descartan. Si ningún fragmento cumple el umbral, retorna mensaje controlado: *"No se encontró información relevante en los documentos institucionales."*
-
-#### 5.4.6. `obtener_plan_de_estudios`
+#### 5.4.5. `obtener_plan_de_estudios`
 
 ```
 Entrada: ()
@@ -495,7 +480,7 @@ Salida : {
 
 Devuelve el plan de estudios completo de la carrera del alumno, ordenado por `anio_plan`, `cuatrimestre`, `nombre`. Usar cuando el alumno pida ver su plan.
 
-#### 5.4.7. `obtener_materias_faltantes`
+#### 5.4.6. `obtener_materias_faltantes`
 
 ```
 Entrada: ()
@@ -514,6 +499,21 @@ Salida : {
 ```
 
 Cruza `materias` con `historia_academica` del alumno: devuelve las que no tienen estado `aprobada` ni `promocionada`. Incluye también las que tienen correlativas sin cumplir (se diferencia de `consultar_materias_disponibles`). El `porcentaje_completado` se calcula en la tool para evitar errores aritméticos del modelo. Cubre consultas como "¿qué me falta para recibirme?", "¿cuánto llevo hecho de la carrera?", "¿qué porcentaje tengo aprobado?".
+
+#### 5.4.7. `buscar_en_documentos`
+
+```
+Entrada: { consulta_semantica : str }
+Salida : list[{
+    documento  : str
+    seccion    : str | null
+    contenido  : str
+    distancia  : float       # distancia coseno (menor es mejor)
+    metadata   : object
+}]
+```
+
+Pipeline: `consulta_semantica` → `nomic-embed-text` → búsqueda ANN con `WHERE embedding <=> $1 <= 0.75 ORDER BY embedding <=> $1 LIMIT 5`. Fragmentos con distancia coseno > 0.75 se descartan. Si ningún fragmento cumple el umbral, retorna mensaje controlado: *"No se encontró información relevante en los documentos institucionales."*
 
 ---
 
@@ -563,9 +563,9 @@ El catálogo de herramientas (`TOOLS_CATALOG` en `app/mcp/server.py`) se entrega
 2. **`obtener_materia`** — Parámetro requerido `nombre_materia: str` (nombre o fragmento del nombre). Devuelve año del plan, cuatrimestre, carga horaria, correlativas y comisiones disponibles con horarios. Disparador: consultas sobre una materia específica.
 3. **`obtener_inscripciones`** — Sin parámetros. Devuelve las inscripciones vigentes del alumno: materia, comisión, día, horario, aula, sede y profesor. Disparadores: "horarios", "agenda", "qué estoy cursando", "a qué me inscribí", "qué tengo este cuatrimestre".
 4. **`consultar_materias_disponibles`** — Sin parámetros. Lista las materias que el alumno puede cursar en el próximo período: sólo incluye materias no aprobadas cuyas correlativas estén cumplidas y que no tengan inscripción activa. Disparadores: "qué puedo cursar", "a qué me puedo inscribir el próximo período".
-5. **`buscar_en_documentos`** — Parámetro requerido `consulta_semantica: str`. Recupera fragmentos relevantes del corpus RAG de documentos institucionales. Restricción explícita en la descripción: usar **sólo** ante preguntas sobre reglamentos o información institucional (para evitar que el modelo la invoque sobre datos académicos personales).
-6. **`obtener_plan_de_estudios`** — Sin parámetros. Devuelve el plan de estudios completo de la carrera del alumno: todas las materias con año, cuatrimestre y carga horaria, más el total de materias. Disparador: "plan de estudios".
-7. **`obtener_materias_faltantes`** — Sin parámetros. Devuelve las materias que el alumno aún no tiene aprobadas ni promocionadas en el plan de su carrera, más el total del plan y la cantidad pendiente. Disparadores: "qué me falta para recibirme", "cuántas materias me quedan", "avance", "porcentaje".
+5. **`obtener_plan_de_estudios`** — Sin parámetros. Devuelve el plan de estudios completo de la carrera del alumno: todas las materias con año, cuatrimestre y carga horaria, más el total de materias. Disparador: "plan de estudios".
+6. **`obtener_materias_faltantes`** — Sin parámetros. Devuelve las materias que el alumno aún no tiene aprobadas ni promocionadas en el plan de su carrera, más el total del plan y la cantidad pendiente. Disparadores: "qué me falta para recibirme", "cuántas materias me quedan", "avance", "porcentaje".
+7. **`buscar_en_documentos`** — Parámetro requerido `consulta_semantica: str`. Recupera fragmentos relevantes del corpus RAG de documentos institucionales. Restricción explícita en la descripción: usar **sólo** cuando el alumno haga preguntas sobre cualquier tema academico o institucional que no puedas responder usando otras herramientas.
 
 Notas de diseño del catálogo:
 

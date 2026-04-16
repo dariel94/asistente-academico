@@ -253,52 +253,7 @@ async def consultar_materias_disponibles(
     return _json_result(result)
 
 
-# ─── 5. buscar_en_documentos ─────────────────────────────────────────────────
-
-async def buscar_en_documentos(
-    ctx: SessionContext, pool, consulta_semantica: str = "", **_kwargs
-) -> str:
-    # Generar embedding de la consulta via Ollama
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        resp = await client.post(
-            f"{config.OLLAMA_BASE_URL}/api/embed",
-            json={"model": config.OLLAMA_EMBED_MODEL, "input": consulta_semantica},
-        )
-        resp.raise_for_status()
-        embedding = resp.json()["embeddings"][0]
-
-    # Búsqueda vectorial con threshold
-    rows = await pool.fetch(
-        """
-        SELECT documento, seccion, contenido,
-               embedding <=> $1::vector AS distancia,
-               metadata
-        FROM documentos_fragmentos
-        WHERE embedding <=> $1::vector <= 0.75
-        ORDER BY embedding <=> $1::vector
-        LIMIT 5
-        """,
-        str(embedding),
-    )
-
-    if not rows:
-        return "No se encontró información relevante en los documentos institucionales."
-
-    return _json_result(
-        [
-            {
-                "documento": r["documento"],
-                "seccion": r["seccion"],
-                "contenido": r["contenido"],
-                "distancia": float(r["distancia"]),
-                "metadata": r["metadata"],
-            }
-            for r in rows
-        ]
-    )
-
-
-# ─── 6. obtener_materias_faltantes ──────────────────────────────────────────
+# ─── 5. obtener_materias_faltantes ──────────────────────────────────────────
 
 async def obtener_materias_faltantes(ctx: SessionContext, pool, **_kwargs) -> str:
     id_carrera = await pool.fetchval(
@@ -344,7 +299,7 @@ async def obtener_materias_faltantes(ctx: SessionContext, pool, **_kwargs) -> st
     })
 
 
-# ─── 7. obtener_plan_de_estudios ────────────────────────────────────────────
+# ─── 6. obtener_plan_de_estudios ────────────────────────────────────────────
 
 async def obtener_plan_de_estudios(ctx: SessionContext, pool, **_kwargs) -> str:
     id_carrera = await pool.fetchval(
@@ -370,6 +325,51 @@ async def obtener_plan_de_estudios(ctx: SessionContext, pool, **_kwargs) -> str:
         "total_materias": len(rows),
         "materias": [dict(r) for r in rows],
     })
+
+
+# ─── 7. buscar_en_documentos ─────────────────────────────────────────────────
+
+async def buscar_en_documentos(
+    ctx: SessionContext, pool, consulta_semantica: str = "", **_kwargs
+) -> str:
+    # Generar embedding de la consulta via Ollama
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        resp = await client.post(
+            f"{config.OLLAMA_BASE_URL}/api/embed",
+            json={"model": config.OLLAMA_EMBED_MODEL, "input": consulta_semantica},
+        )
+        resp.raise_for_status()
+        embedding = resp.json()["embeddings"][0]
+
+    # Búsqueda vectorial con threshold
+    rows = await pool.fetch(
+        """
+        SELECT documento, seccion, contenido,
+               embedding <=> $1::vector AS distancia,
+               metadata
+        FROM documentos_fragmentos
+        WHERE embedding <=> $1::vector <= 0.75
+        ORDER BY embedding <=> $1::vector
+        LIMIT 5
+        """,
+        str(embedding),
+    )
+
+    if not rows:
+        return "No se encontró información relevante en los documentos institucionales."
+
+    return _json_result(
+        [
+            {
+                "documento": r["documento"],
+                "seccion": r["seccion"],
+                "contenido": r["contenido"],
+                "distancia": float(r["distancia"]),
+                "metadata": r["metadata"],
+            }
+            for r in rows
+        ]
+    )
 
 
 # ─── Registro ────────────────────────────────────────────────────────────────

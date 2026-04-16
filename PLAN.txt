@@ -17,20 +17,25 @@ Plan de Implementacion — Asistente Virtual Academico Modular
      Archivos a crear:
      - db/01_schema.sql — DDL completo (tablas §3.1–3.5, tabla vectorial §4.1, indices §3.4, indice HNSW
      §4.1)
-     - db/02_seed.sql — Datos de prueba: 1 carrera, ~10 materias con correlativas, 2 alumnos con historia
-     academica, comisiones, horarios, inscripciones
+     - db/02_seed.sql — Datos de prueba segun §10: 2 carreras (Sistemas, Administracion), 22 materias con
+     correlativas (11 + 11), 6 alumnos con perfiles diversos, comisiones con horarios para periodo
+     2026-1C, historia academica cubriendo los escenarios de §10.8, inscripciones de §10.7
 
      Tareas:
      1. Escribir 01_schema.sql con todas las tablas en orden de dependencia (carreras → alumnos → materias →
      correlativas → comisiones → horarios → inscripciones → historia_academica → conversaciones → resumenes →
       documentos_fragmentos)
      2. Incluir extension CREATE EXTENSION IF NOT EXISTS vector
-     3. Incluir todos los indices (§3.4 + HNSW §4.1)
-     4. Escribir 02_seed.sql con datos realistas para testing
-     5. Passwords de seed hasheados con bcrypt (precomputar hash para password conocido, ej. "password123")
+     3. Incluir todos los indices (§3.4 — idx_historia_alumno compuesto (id_alumno, estado),
+     idx_conversaciones_alumno, idx_inscripciones_alumno — y HNSW §4.1)
+     4. Escribir 02_seed.sql reflejando fielmente §10.1–10.7: carreras, materias con correlativas, comisiones
+     con sus horarios, los 6 alumnos (SIS-1001..1004, ADM-2001..2002), historia academica por alumno
+     (incluyendo recursadas de Ana SIS-1003) e inscripciones vigentes
+     5. Passwords de seed hasheados con bcrypt (precomputar hash para "password123" segun §10)
 
-     Verificacion: Ejecutar ambos scripts contra PostgreSQL local y verificar que no hay errores. Consultar
-     tablas para confirmar datos.
+     Verificacion: Ejecutar ambos scripts contra PostgreSQL 18 local y verificar que no hay errores.
+     Consultar tablas para confirmar que estan cubiertos los escenarios de §10.8 (recursadas, estado libre,
+     desaprobada, promocionada, alumno sin historia, aislamiento por carrera, alumno sin inscripciones).
 
      ---
      Fase 2: Scaffolding del backend + configuracion
@@ -282,8 +287,8 @@ Plan de Implementacion — Asistente Virtual Academico Modular
      Prerequisitos del entorno
 
      Antes de empezar, verificar que estan instalados:
-     - PostgreSQL 16 con extension pgvector
-     - Ollama con modelos llama3.1:8b-instruct-q5_K_M y nomic-embed-text descargados
+     - PostgreSQL 18 con extension pgvector 0.7+
+     - Ollama 0.3+ con modelos llama3.1:8b-instruct-q5_K_M y nomic-embed-text descargados
      - Python 3.11+
      - Node.js 20+
 

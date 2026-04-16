@@ -158,7 +158,9 @@ Los requerimientos funcionales definen los servicios y funciones que el asistent
 
 - **RF8. Consulta de Avance de Carrera:** El asistente debe brindar informacion sobre el avance del alumno en la carrera, como porcentaje total, materias terminadas y faltantes.
 
-- **RF9. Gestión de Contexto Conversacional:** El asistente debe mantener la coherencia en diálogos de varios turnos, permitiendo el uso de referencias anafóricas (ej: "¿Y en qué sede curso esa materia?").
+- **RF9. Busqueda en Documentos Institucionales:** El asistente debe poder responder las preguntas sobre datos academicos institucionales que tenga en su conocimiento.
+
+- **RF10. Gestión de Contexto Conversacional:** El asistente debe mantener la coherencia en diálogos de varios turnos, permitiendo el uso de referencias anafóricas (ej: "¿Y en qué sede curso esa materia?").
 
 ### 3.2. Requerimientos No Funcionales (RNF)
 
@@ -198,7 +200,7 @@ El módulo relacional está diseñado bajo la Tercera Forma Normal (3NF) para as
 
 #### 4.1.2. El Esquema Vectorial: Motor de Búsqueda Semántica (RAG)
 
-Para la información no estructurada, como los Planes de Estudio y el Reglamento General de Alumnos, se utiliza un pipeline de Generación Aumentada por Recuperación (RAG) integrado en la base de datos.
+Para la información no estructurada, como el estatuto o documentos institucionales en PDF, se utiliza un pipeline de Generación Aumentada por Recuperación (RAG) integrado en la base de datos.
 
 - **Pipeline de Procesamiento Documental:** Los documentos PDF oficiales se someten a un proceso de chunking (fragmentación), dividiendo el texto en segmentos de longitud fija con un solapamiento (overlap) estratégico para preservar el contexto entre párrafos.
 
@@ -208,17 +210,11 @@ Para la información no estructurada, como los Planes de Estudio y el Reglamento
 
 #### 4.1.3. Métrica de Recuperación: Distancia del Coseno
 
-Para determinar qué fragmento del reglamento responde mejor a la consulta del usuario, el sistema calcula la similitud semántica entre el vector de la pregunta ($A$) y cada vector almacenado ($B$). Se utiliza la **Similitud del Coseno**, que mide el ángulo entre dos vectores independientemente de su magnitud, siendo la métrica más adecuada para comparar representaciones textuales:
+Para determinar qué fragmento del documento responde mejor a la consulta del usuario, el sistema calcula la similitud semántica entre el vector de la pregunta ($A$) y cada vector almacenado ($B$). Se utiliza la **Similitud del Coseno**, que mide el ángulo entre dos vectores independientemente de su magnitud, siendo la métrica más adecuada para comparar representaciones textuales:
 
 $$\text{similitud}(A, B) = \frac{A \cdot B}{\|A\| \|B\|}$$
 
 El resultado varía entre 0 (sin relación semántica) y 1 (máxima similitud). En la implementación, pgvector utiliza el operador `<=>` que calcula la **distancia** del coseno ($d = 1 - \text{similitud}$), por lo que valores menores indican mayor relevancia.
-
-#### 4.1.4. Sinergia Híbrida: La Consulta Consolidada
-
-La fortaleza de este diseño reside en la capacidad del LLM de orquestar consultas cruzadas entre ambos esquemas. El modelo puede invocar múltiples herramientas MCP en una misma interacción, combinando datos relacionales y vectoriales para construir una respuesta unificada.
-
-**Ejemplo de flujo:** Ante la pregunta "¿Puedo cursar Base de Datos?", el modelo puede invocar primero una herramienta SQL para verificar si el alumno tiene aprobadas las correlativas necesarias (dato relacional) y luego una búsqueda semántica para recuperar del plan de estudio los requisitos adicionales de carga horaria o prácticas profesionales (dato vectorial), sintetizando ambos resultados en una respuesta coherente.
 
 ### 4.2. Arquitectura del Servidor MCP y Definición de Herramientas (Tools)
 
@@ -242,9 +238,9 @@ Se definen herramientas específicas parametrizadas que el modelo puede invocar 
 | `obtener_materia`                | SQL            | `nombre_materia`         | Información, carga horaria, correlativas y más para la materia solicitada                                            |
 | `obtener_inscripciones`          | SQL            | _(Ninguno - Usa sesión)_ | Inscripciones vigentes del alumno con grilla semanal (materias, horarios, aulas, profesores)                         |
 | `consultar_materias_disponibles` | SQL            | _(Ninguno - Usa sesión)_ | Materias habilitadas para inscripción (con correlativas cumplidas) y sus comisiones                                  |
-| `buscar_en_documentos`           | Vectorial      | `consulta_semantica`     | Fragmentos relevantes de planes de estudio y reglamentos (RAG)                                                       |
 | `obtener_plan_de_estudios`       | SQL            | _(Ninguno - Usa sesión)_ | Plan de estudios completo de la carrera del alumno (materias + total)                                                |
 | `obtener_materias_faltantes`     | SQL            | _(Ninguno - Usa sesión)_ | Materias pendientes para recibirse, con aprobadas, faltantes y porcentaje de avance                                  |
+| `buscar_en_documentos`           | Vectorial      | `consulta_semantica`     | Fragmentos relevantes del los documentos institucionales                                                             |
 
 #### 4.2.3. Inyección de Contexto y Seguridad en la Capa MCP
 
@@ -299,7 +295,7 @@ Para garantizar la integridad de los datos y la confiabilidad de las respuestas,
 
 El acceso al sistema requiere que el alumno se autentique mediante sus credenciales institucionales (legajo y contraseña). El backend valida las credenciales contra la base de datos utilizando hashing seguro (bcrypt) y, en caso exitoso, emite un **token JWT (JSON Web Token)** que contiene el identificador único del alumno y una expiración temporal. Este token se incluye en todas las solicitudes posteriores del frontend, permitiendo al backend identificar al usuario sin requerir una nueva autenticación en cada mensaje. La sesión se mantiene exclusivamente en memoria del navegador (sin persistencia en `localStorage`), minimizando la superficie de exposición del token.
 
-#### 4.4.2. Inyección de Perfil y Aislamiento de Contexto
+#### 4.4.2. Inyección de Perfil y Aislamiento de Contexto (REVISAR SI SE CUMPLE)
 
 La seguridad de los datos personales no reside en el modelo de lenguaje, sino en el proceso de inyección de contexto que ocurre en el backend.
 
@@ -346,7 +342,7 @@ El frontend se organiza en tres capas funcionales independientes, cada una con r
 
 - **Capa de Contexto:** Panel auxiliar que expone al alumno su perfil autenticado y el estado de la sesión activa. Su propósito es reforzar la transparencia del sistema: el usuario puede verificar en todo momento bajo qué identidad opera el asistente.
 
-#### 4.5.3. Protocolo de Comunicación: Server-Sent Events (SSE)
+#### 4.5.3. Protocolo de Comunicación: Server-Sent Events (SSE) (REVISAR SI ESTO SE CUMPLE)
 
 El mecanismo de comunicación entre el frontend y el backend para la entrega de respuestas es **SSE (Server-Sent Events)**. La elección de SSE por sobre WebSockets responde a tres factores arquitectónicos:
 
@@ -407,7 +403,7 @@ psql -U app_user -d asistente_academico -f backend/db/02_seed.sql
 
 El esquema relacional se implementa en el archivo `01_schema.sql`, ejecutado mediante `psql` sobre la instancia de PostgreSQL durante la inicialización del proyecto. Las tablas se crean siguiendo el orden de dependencias para respetar las restricciones de integridad referencial.
 
-A modo ilustrativo, se muestran las tablas de dimensiones maestras y la tabla central de historia académica. El esquema completo (incluyendo tablas operativas, memoria conversacional e índices) se encuentra en el Anexo A.1.
+A modo ilustrativo, se muestran las tablas de dimensiones maestras y la tabla central de historia académica. El esquema completo (incluyendo tablas operativas, memoria conversacional e índices) se encuentra en el Anexo A.
 
 **Tablas de Dimensiones Maestras:**
 
@@ -477,7 +473,7 @@ La restricción `UNIQUE` en `resumenes.id_alumno` garantiza un único resumen ac
 
 El archivo `02_seed.sql` contiene los datos de prueba que permiten validar el comportamiento del asistente en un entorno académico simulado pero realista. Los datos se insertan ejecutando el script con `psql` inmediatamente después de la creación del esquema.
 
-Se definen dos carreras con planes de estudio representativos y seis alumnos con diferentes estados y niveles de avance para ejercitar todos los escenarios del asistente. Las contraseñas se almacenan como hashes bcrypt; en el entorno de prueba, todos los alumnos comparten la contraseña `test1234`. Los datos completos se encuentran en el Anexo A.2.
+Se definen dos carreras con planes de estudio representativos y seis alumnos con diferentes estados y niveles de avance para ejercitar todos los escenarios del asistente. Las contraseñas se almacenan como hashes bcrypt; en el entorno de prueba, todos los alumnos comparten la contraseña `password123`. Los datos completos se encuentran en el Anexo A.
 
 **Escenarios de prueba:**
 
@@ -542,7 +538,7 @@ La función central `fragmentar_texto(texto: str) -> list[str]` recorre el texto
 - **`chunk_overlap = 200`:** Un solapamiento del 25% garantiza que las oraciones que caen en los bordes de un fragmento no pierdan su contexto adyacente.
 - **Separadores jerárquicos:** Se prioriza cortar en doble salto de línea (cambio de párrafo), luego salto simple, luego punto seguido, minimizando las rupturas semánticas.
 
-El pipeline completo (lectura de PDF, generación de embeddings e inserción en la base de datos) se encuentra en el Anexo A.3.
+El pipeline completo (lectura de PDF, generación de embeddings e inserción en la base de datos) se encuentra en el Anexo A.
 
 ---
 
@@ -570,7 +566,7 @@ Antes de definir las herramientas, se implementan dos funciones de soporte que s
 
 #### 5.3.3. Definición de Herramientas (Tools)
 
-Cada herramienta se registra en el servidor MCP mediante decoradores que definen su nombre, descripción y parámetros. El modelo de lenguaje recibe este catálogo como parte de su contexto y decide cuál invocar según la intención del usuario. A continuación se presentan dos herramientas representativas; las siete herramientas completas se encuentran en el Anexo A.4.
+Cada herramienta se registra en el servidor MCP mediante decoradores que definen su nombre, descripción y parámetros. El modelo de lenguaje recibe este catálogo como parte de su contexto y decide cuál invocar según la intención del usuario. A continuación se presentan dos herramientas representativas; las siete herramientas completas se encuentran en el Anexo A.
 
 **Herramienta 1: `obtener_historia_academica`**
 
@@ -602,7 +598,7 @@ El patrón de **doble `NOT EXISTS`** verifica las correlatividades distinguiendo
 - **Tipo `aprobada`:** El alumno debe tener la materia correlativa con estado `aprobada` o `promocionada` (examen final aprobado o promoción directa).
 - **Tipo `regularizada`:** El alumno debe haber aprobado al menos la cursada de la materia correlativa, lo que corresponde a los estados `regularizada`, `aprobada` o `promocionada`. Los estados `desaprobada` y `libre` no satisfacen esta condición, ya que implican que el alumno no completó la cursada.
 
-Las herramientas restantes (`obtener_materia`, `obtener_inscripciones`, `buscar_en_documentos`, `obtener_plan_de_estudios` y `obtener_materias_faltantes`) siguen patrones análogos y se documentan completas en el Anexo A.4. Vale la pena destacar el diseño de `obtener_materias_faltantes`, que resuelve la consulta *"¿qué me falta para recibirme?"* cruzando el plan de la carrera con la historia académica del alumno y calculando en la propia capa SQL los totales de aprobadas, faltantes y el porcentaje de avance. Esto evita delegar la aritmética al modelo, que en el tamaño 8B es propenso a errores de cálculo.
+Las herramientas restantes (`obtener_materia`, `obtener_inscripciones`, `buscar_en_documentos`, `obtener_plan_de_estudios` y `obtener_materias_faltantes`) siguen patrones análogos y se documentan completas en el Anexo A. Vale la pena destacar el diseño de `obtener_materias_faltantes`, que resuelve la consulta *"¿qué me falta para recibirme?"* cruzando el plan de la carrera con la historia académica del alumno y calculando en la propia capa SQL los totales de aprobadas, faltantes y el porcentaje de avance. Esto evita delegar la aritmética al modelo, que en el tamaño 8B es propenso a errores de cálculo.
 
 #### 5.3.4. Mecanismo de Inyección de Identidad
 
@@ -614,7 +610,7 @@ class SessionContext:
     perfil: dict     # nombre, apellido, legajo, carrera, estado
 ```
 
-La función `crear_sesion_mcp(id_alumno: int) -> SessionContext` se invoca al autenticarse el alumno: recupera su perfil con un `JOIN` entre `alumnos` y `carreras` y lo empaqueta en la instancia que acompañará a todas las invocaciones de herramientas de esa sesión. La implementación completa se encuentra en el Anexo A.4.
+La función `crear_sesion_mcp(id_alumno: int) -> SessionContext` se invoca al autenticarse el alumno: recupera su perfil con un `JOIN` entre `alumnos` y `carreras` y lo empaqueta en la instancia que acompañará a todas las invocaciones de herramientas de esa sesión. La implementación completa se encuentra en el Anexo A.
 
 De este modo, cuando el modelo invoca `obtener_historia_academica`, el servidor MCP resuelve el `id_alumno` desde el `SessionContext` de la conexión, no desde los argumentos generados por el LLM. Incluso si un usuario intenta manipular al modelo mediante prompt injection para consultar datos ajenos, la capa MCP ignora cualquier parámetro de identidad externo.
 
@@ -734,7 +730,7 @@ El orquestador se comunica con Ollama mediante un cliente HTTP compatible con la
 5. Si hay herramientas válidas, las ejecuta secuencialmente (hasta `MAX_TOOL_CALLS`), reinyectando cada resultado como `{"role": "tool", "content": <resultado>}`, y luego llama a `ollama_chat(messages, stream=True)` emitiendo chunks.
 6. Si no las hay, entrega directamente el `content` ya obtenido como un único `chunk`.
 
-El catálogo de herramientas `TOOLS_CATALOG` y el dispatcher `MCPServer.dispatch` se documentan completos en el Anexo A.5.
+El catálogo de herramientas `TOOLS_CATALOG` y el dispatcher `MCPServer.dispatch` se documentan completos en el Anexo A.
 
 #### 5.5.3. Gestión de Memoria Híbrida
 
@@ -750,7 +746,7 @@ La implementación del sistema de memoria combina las dos estrategias descritas 
 - `obtener_contexto(id_alumno: int) -> list[dict]` — devuelve, en formato de mensajes (`{"role", "content"}`), el resumen acumulado (si existe, con rol `system` y prefijo *"Resumen de la conversación previa:"*) seguido de los últimos `VENTANA_MENSAJES` mensajes literales ordenados cronológicamente.
 - `guardar_intercambio(id_alumno: int, pregunta: str, respuesta: str) -> None` — persiste el par `(user, assistant)` en la tabla `conversaciones` y, si el total supera `UMBRAL_SUMARIZACION`, invoca la rutina interna `_sumarizar_antiguos`.
 
-Cuando se supera el umbral, el propio LLM genera un resumen de los mensajes más antiguos, que se persiste en la tabla `resumenes` (única fila por alumno, ver sección 5.2.1) y reemplaza los mensajes originales. La implementación completa del `MemoryManager`, incluyendo la lógica de sumarización, se encuentra en el Anexo A.6.
+Cuando se supera el umbral, el propio LLM genera un resumen de los mensajes más antiguos, que se persiste en la tabla `resumenes` (única fila por alumno, ver sección 5.2.1) y reemplaza los mensajes originales. La implementación completa del `MemoryManager`, incluyendo la lógica de sumarización, se encuentra en el Anexo A.
 
 #### 5.5.4. System Prompt y Prompt Hardening
 
@@ -773,9 +769,9 @@ El catálogo de herramientas (`TOOLS_CATALOG` en `app/mcp/server.py`) no se enum
 2. **`obtener_materia`** — Parámetro requerido `nombre_materia: str` (nombre o fragmento del nombre). Devuelve año del plan, cuatrimestre, carga horaria, correlativas y comisiones disponibles con horarios. Disparador: consultas sobre una materia específica.
 3. **`obtener_inscripciones`** — Sin parámetros. Devuelve las inscripciones vigentes del alumno: materia, comisión, día, horario, aula, sede y profesor. Disparadores: "horarios", "agenda", "qué estoy cursando", "a qué me inscribí", "qué tengo este cuatrimestre".
 4. **`consultar_materias_disponibles`** — Sin parámetros. Lista las materias que el alumno puede cursar en el próximo período: sólo incluye materias no aprobadas cuyas correlativas estén cumplidas y que no tengan inscripción activa. Disparadores: "qué puedo cursar", "a qué me puedo inscribir el próximo período".
-5. **`buscar_en_documentos`** — Parámetro requerido `consulta_semantica: str`. Recupera fragmentos relevantes del corpus RAG de documentos institucionales. Restricción explícita en la descripción: usar **sólo** ante preguntas sobre reglamentos o información institucional, para evitar que el modelo la invoque sobre datos académicos personales.
-6. **`obtener_plan_de_estudios`** — Sin parámetros. Devuelve el plan de estudios completo de la carrera del alumno: todas las materias con año, cuatrimestre y carga horaria, más el total de materias. Disparador: "plan de estudios".
-7. **`obtener_materias_faltantes`** — Sin parámetros. Devuelve las materias que el alumno aún no tiene aprobadas ni promocionadas en el plan de su carrera, más el total del plan y la cantidad pendiente. Disparadores: "qué me falta para recibirme", "cuántas materias me quedan", "avance", "porcentaje".
+5. **`obtener_plan_de_estudios`** — Sin parámetros. Devuelve el plan de estudios completo de la carrera del alumno: todas las materias con año, cuatrimestre y carga horaria, más el total de materias. Disparador: "plan de estudios".
+6. **`obtener_materias_faltantes`** — Sin parámetros. Devuelve las materias que el alumno aún no tiene aprobadas ni promocionadas en el plan de su carrera, más el total del plan y la cantidad pendiente. Disparadores: "qué me falta para recibirme", "cuántas materias me quedan", "avance", "porcentaje".
+7. **`buscar_en_documentos`** — Parámetro requerido `consulta_semantica: str`. Recupera fragmentos relevantes del corpus RAG de documentos institucionales. Restricción explícita en la descripción: usar **sólo** ante preguntas sobre cualquier tema academico o institucional que el modelo no pueda responder usando las otras herramientas.
 
 Cada entrada combina un `name` (identificador invocable), una `description` en lenguaje natural con pistas explícitas sobre cuándo usarla (verbos y sinónimos que el alumno suele emplear), y un `parameters` en JSON Schema que delimita los argumentos que el modelo puede generar. Las herramientas sin `properties` no reciben parámetros del LLM: su entrada proviene exclusivamente del `SessionContext` inyectado por el servidor MCP (sección 5.3), preservando el aislamiento de identidad descrito en 4.4. Las herramientas con parámetros (`obtener_materia`, `buscar_en_documentos`) reciben únicamente texto libre usado como filtro de búsqueda, nunca como selector de identidad.
 
@@ -793,7 +789,7 @@ Los endpoints del backend constituyen el punto de entrada HTTP que conecta el fr
   - `X-Accel-Buffering: no` — necesario para entornos donde un proxy inverso (como Nginx) podría almacenar en búfer las respuestas SSE, bloqueando la entrega progresiva de chunks al frontend.
 - **Cuerpo del stream:** una secuencia de líneas `data: <payload>\n\n` donde `<payload>` es cada evento emitido por el generador `process` (sección 5.4.2), con `tipo ∈ {"estado", "chunk"}`.
 
-El handler crea el `SessionContext` con `crear_sesion_mcp(id_alumno)`, instancia un `MemoryManager` y delega en el generador `process(...)` para producir los eventos. Los endpoints completos (autenticación, chat y punto de entrada de la aplicación) se documentan en el Anexo A.7.
+El handler crea el `SessionContext` con `crear_sesion_mcp(id_alumno)`, instancia un `MemoryManager` y delega en el generador `process(...)` para producir los eventos. Los endpoints completos (autenticación, chat y punto de entrada de la aplicación) se documentan en el Anexo A.
 
 Se utiliza el patrón `lifespan` de FastAPI para garantizar que el pool de conexiones a PostgreSQL esté disponible antes de atender la primera solicitud. La configuración de CORS permite la comunicación entre el frontend (puerto 5173, servido por Vite en modo desarrollo) y el backend (puerto 8000); en producción, al servir ambos desde el mismo origen, esta configuración puede removerse.
 
@@ -844,7 +840,7 @@ El flujo de autenticación comienza en `LoginPage`, que envía las credenciales 
 - **Response (401):** dispara el mensaje *"Legajo o contraseña incorrectos."* en el formulario.
 - **Callback:** `onLogin(token, perfil)` eleva el resultado al componente `App`.
 
-El token recibido se incluye en el header `Authorization` de todas las solicitudes posteriores. No se persiste en `localStorage` dado que la sesión es por pestaña, lo que minimiza la superficie de exposición del token. El componente completo se encuentra en el Anexo A.8.
+El token recibido se incluye en el header `Authorization` de todas las solicitudes posteriores. No se persiste en `localStorage` dado que la sesión es por pestaña, lo que minimiza la superficie de exposición del token. El componente completo se encuentra en el Anexo A.
 
 #### 5.6.3. Manejo de Estado de la Conversación
 
@@ -860,7 +856,7 @@ type ChatAction =
   | { type: "SET_ERROR"; mensaje: string };
 ```
 
-El caso `AGREGAR_CHUNK` es el más frecuente durante el streaming de una respuesta: cada fragmento recibido del backend se concatena al contenido del último mensaje del asistente, produciendo la sensación de escritura en tiempo real. El reducer completo se encuentra en el Anexo A.8.
+El caso `AGREGAR_CHUNK` es el más frecuente durante el streaming de una respuesta: cada fragmento recibido del backend se concatena al contenido del último mensaje del asistente, produciendo la sensación de escritura en tiempo real. El reducer completo se encuentra en el Anexo A.
 
 #### 5.6.4. Comunicación en Tiempo Real: Server-Sent Events (SSE)
 
@@ -869,11 +865,11 @@ El hook `useChat` encapsula toda la lógica de comunicación con el backend. Par
 - Si es un objeto con `tipo === "estado"`, despacha `SET_ESTADO` con los campos `valor` y `herramienta` (actualizando el indicador visible).
 - Si el parseo falla, lo trata como texto plano de la respuesta y despacha `AGREGAR_CHUNK` para concatenarlo al último mensaje del asistente.
 
-El hook completo, incluyendo el manejo de buffer para eventos SSE fragmentados (necesario porque un mismo `TextDecoder.decode` puede devolver varios eventos concatenados o uno partido por la mitad), se encuentra en el Anexo A.8.
+El hook completo, incluyendo el manejo de buffer para eventos SSE fragmentados (necesario porque un mismo `TextDecoder.decode` puede devolver varios eventos concatenados o uno partido por la mitad), se encuentra en el Anexo A.
 
 #### 5.6.5. Renderizado de Respuestas con react-markdown
 
-Las respuestas del asistente se renderizan con **`react-markdown`**, que interpreta la sintaxis Markdown que el modelo produce de forma natural (listas, negritas, bloques de código para mostrar SQL o fragmentos técnicos). `MessageBubble` recibe `{ mensaje: Mensaje }` donde `Mensaje` expone los campos `rol`, `contenido` y `streaming`, y ramifica el render según el rol: los mensajes del usuario se muestran como texto plano dentro de un `<p>`, mientras que los del asistente pasan por `ReactMarkdown` con un componente custom para `code` que aplica estilos Tailwind (`bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-xs font-mono`). Mientras `mensaje.streaming` sea `true`, se anexa un cursor parpadeante (`animate-pulse`) al final del texto, reforzando la percepción de tiempo real. El componente `MessageBubble` completo se encuentra en el Anexo A.8.
+Las respuestas del asistente se renderizan con **`react-markdown`**, que interpreta la sintaxis Markdown que el modelo produce de forma natural (listas, negritas, bloques de código para mostrar SQL o fragmentos técnicos). `MessageBubble` recibe `{ mensaje: Mensaje }` donde `Mensaje` expone los campos `rol`, `contenido` y `streaming`, y ramifica el render según el rol: los mensajes del usuario se muestran como texto plano dentro de un `<p>`, mientras que los del asistente pasan por `ReactMarkdown` con un componente custom para `code` que aplica estilos Tailwind (`bg-gray-100 text-gray-800 px-1 py-0.5 rounded text-xs font-mono`). Mientras `mensaje.streaming` sea `true`, se anexa un cursor parpadeante (`animate-pulse`) al final del texto, reforzando la percepción de tiempo real. El componente `MessageBubble` completo se encuentra en el Anexo A.
 
 #### 5.6.6. Flujo Completo de una Sesión Académica
 

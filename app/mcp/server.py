@@ -74,26 +74,6 @@ TOOLS_CATALOG = [
     {
         "type": "function",
         "function": {
-            "name": "buscar_en_documentos",
-            "description": (
-                "Busca información en los documentos institucionales. Usar SOLO cuando el alumno haga preguntas "
-                "sobre reglamentos o información institucional."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "consulta_semantica": {
-                        "type": "string",
-                        "description": "Pregunta o tema a buscar en los documentos",
-                    }
-                },
-                "required": ["consulta_semantica"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "obtener_plan_de_estudios",
             "description": (
                 "Obtiene el plan de estudios completo de la carrera del alumno: "
@@ -117,6 +97,26 @@ TOOLS_CATALOG = [
             "parameters": {"type": "object", "properties": {}, "required": []},
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "buscar_en_documentos",
+            "description": (
+                "Busca información en los documentos institucionales. Usar SOLO cuando el alumno haga preguntas "
+                "sobre cualquier tema academico o institucional que no puedas responder usando otras herramientas."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "consulta_semantica": {
+                        "type": "string",
+                        "description": "Pregunta o tema a buscar en los documentos",
+                    }
+                },
+                "required": ["consulta_semantica"],
+            },
+        },
+    }
 ]
 
 
