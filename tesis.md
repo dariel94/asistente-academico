@@ -1,4 +1,4 @@
-# Asistente Virtual Académico Modular
+Asistente Académico: Agente Conversacional con Tool Calling
 
 ## Índice
 
@@ -50,15 +50,17 @@ En este contexto de modernización administrativa y tecnológica, surge la oport
 
 ### 1.2. Objetivo General
 
-Diseñar e implementar un marco de arquitectura para un asistente virtual académico modular, basado en modelos de lenguaje de gran escala (LLM) de ejecución local, que permita centralizar y agilizar el acceso a información administrativa y académica en instituciones de educación superior.
+Diseñar e implementar un marco de arquitectura para un agente conversacional académico, basado en modelos de lenguaje de gran escala (LLM) de ejecución local, que permita centralizar y agilizar el acceso a información académica e institucional por medio del uso de herramientas (Tool Calling).
 
 ### 1.3. Objetivos Específicos
 
+- Desarrollar una capa de abstracción de datos mediante el protocolo MCP (Model Context Protocol), permitiendo la interoperabilidad del asistente con bases de datos académicas relacionales (SQL) y vectoriales (RAG) de forma estandarizada.
+
 - Implementar un motor de inferencia local utilizando el modelo Llama 3.1 8B, optimizado mediante técnicas de cuantización para garantizar respuestas en lenguaje natural con baja latencia y total independencia de proveedores de nube.
 
-- Desarrollar una capa de abstracción de datos mediante el protocolo MCP (Model Context Protocol), permitiendo la interoperabilidad del asistente con sistemas de gestión académica (SQL) y bases de datos vectoriales (RAG) de forma estandarizada.
-
 - Diseñar e integrar un sistema de memoria híbrida que combine la gestión de mensajes recientes con técnicas de resumen dinámico, asegurando la persistencia del contexto en conversaciones extensas sin degradar el rendimiento del modelo.
+
+- Desplegar una interface de usuario con autenticacion para los usuarios alumnos (frontend) y un servidor orquestador (backend) para el manejo de mensajes enviados y su procesamiento.
 
 - Establecer un esquema de seguridad y privacidad multinivel, integrando la autenticación de usuarios con el filtrado de consultas basado en perfiles, y aplicando técnicas de System Prompt Hardening para mitigar vulnerabilidades como el Prompt Injection.
 
@@ -564,13 +566,13 @@ Antes de definir las herramientas, se implementan dos funciones de soporte que s
   - Payload: `{"model": "nomic-embed-text", "prompt": texto}`
   - Respuesta: campo `embedding` con un vector de 768 dimensiones (`list[float]`)
 
-#### 5.3.3. Definición de Herramientas (Tools)
+#### 5.3.3. Creacion de Herramientas (Tools)
 
-Cada herramienta se registra en el servidor MCP mediante decoradores que definen su nombre, descripción y parámetros. El modelo de lenguaje recibe este catálogo como parte de su contexto y decide cuál invocar según la intención del usuario. A continuación se presentan dos herramientas representativas; las siete herramientas completas se encuentran en el Anexo A.
+Cada herramienta se registra en el servidor MCP mediante decoradores que definen su nombre, descripción y parámetros. El modelo de lenguaje recibe este catálogo (sección 4.2.2) como parte de su contexto y decide cuál invocar según la intención del usuario. A continuación se declara el contrato de las siete herramientas en el mismo orden del catálogo; la implementación SQL completa se encuentra en el Anexo A.
 
 **Herramienta 1: `obtener_historia_academica`**
 
-Esta herramienta no recibe parámetros del modelo. El identificador del alumno se inyecta desde la sesión activa, implementando el aislamiento de datos descrito en la sección 4.4. Contrato:
+No recibe parámetros del modelo. El identificador del alumno se inyecta desde la sesión activa, implementando el aislamiento de datos descrito en la sección 4.4. Contrato:
 
 - **Firma:** `obtener_historia_academica(ctx: SessionContext) -> list[TextContent]`
 - **Parámetros del modelo:** ninguno.
@@ -578,14 +580,35 @@ Esta herramienta no recibe parámetros del modelo. El identificador del alumno s
 - **Consulta:** `JOIN` de `historia_academica` con `materias` y `carreras` filtrando por `id_alumno` y ordenando por fecha descendente; devuelve por registro: `materia, estado, nota_cursada, nota_final, periodo, carrera`.
 - **Salida vacía:** `"No se encontraron registros académicos para este alumno."`
 
-**Herramienta 5: `consultar_materias_disponibles`**
+**Herramienta 2: `obtener_materia`**
 
-Esta es la herramienta más compleja del catálogo. Determina qué materias puede inscribir el alumno en el período vigente, verificando automáticamente el cumplimiento de correlatividades. Contrato:
+Resuelve una consulta puntual sobre una materia de la carrera del alumno. Admite fragmentos del nombre para tolerar variaciones de tipeo y pluralizaciones. Contrato:
+
+- **Firma:** `obtener_materia(ctx: SessionContext, nombre_materia: str) -> list[TextContent]`
+- **Parámetros del modelo:** `nombre_materia: str` (nombre o fragmento del nombre).
+- **Entradas efectivas:** `nombre_materia` y el `id_carrera` del alumno (aislamiento por carrera).
+- **Consulta:** búsqueda parcial insensible a mayúsculas (`ILIKE '%' || $1 || '%'`) sobre `materias` filtrada por la carrera del alumno, con `JOIN` a `correlativas`, `comisiones` y `horarios`. Si hay múltiples coincidencias, se retornan todas como lista.
+- **Salida por materia:** `nombre, anio_plan, cuatrimestre, carga_horaria`, la lista de correlativas (`nombre`, `tipo`) y la lista de comisiones con sus horarios, aula, sede y profesor.
+- **Salida vacía:** `"No se encontró ninguna materia con ese nombre en tu carrera."`
+
+**Herramienta 3: `obtener_inscripciones`**
+
+Devuelve la grilla semanal del alumno para el cuatrimestre actual. Cubre consultas sobre horarios, agenda, materias en curso o inscripciones vigentes. Contrato:
+
+- **Firma:** `obtener_inscripciones(ctx: SessionContext) -> list[TextContent]`
+- **Parámetros del modelo:** ninguno.
+- **Entradas efectivas:** `ctx.id_alumno` y el período devuelto por `obtener_periodo_vigente()`.
+- **Consulta:** `JOIN` de `inscripciones` con `comisiones`, `materias` y `horarios`, filtrando por `id_alumno` y por `comisiones.periodo = periodo_vigente`, ordenado por `dia_semana, hora_inicio`.
+- **Salida por registro:** `dia_semana, hora_inicio, hora_fin, materia, comision, aula, sede, profesor`.
+
+**Herramienta 4: `consultar_materias_disponibles`**
+
+Es la herramienta más compleja del catálogo. Determina qué materias puede inscribir el alumno en el período vigente, verificando automáticamente el cumplimiento de correlatividades. Contrato:
 
 - **Firma:** `consultar_materias_disponibles(ctx: SessionContext) -> list[TextContent]`
 - **Parámetros del modelo:** ninguno.
 - **Entradas efectivas:** `ctx.id_alumno`, `id_carrera` del alumno y `periodo` (calculado por `obtener_periodo_vigente`).
-- **Salida por materia:** `id_materia, nombre, anio_plan, cuatrimestre, carga_horaria`.
+- **Salida por materia:** `id_materia, nombre, anio_plan, cuatrimestre, carga_horaria` más las comisiones del período vigente con sus horarios.
 
 La lógica SQL cruza tres fuentes (plan de la carrera, historia académica y correlativas) mediante tres filtros `NOT EXISTS` encadenados sobre la tabla `materias`:
 
@@ -598,7 +621,36 @@ El patrón de **doble `NOT EXISTS`** verifica las correlatividades distinguiendo
 - **Tipo `aprobada`:** El alumno debe tener la materia correlativa con estado `aprobada` o `promocionada` (examen final aprobado o promoción directa).
 - **Tipo `regularizada`:** El alumno debe haber aprobado al menos la cursada de la materia correlativa, lo que corresponde a los estados `regularizada`, `aprobada` o `promocionada`. Los estados `desaprobada` y `libre` no satisfacen esta condición, ya que implican que el alumno no completó la cursada.
 
-Las herramientas restantes (`obtener_materia`, `obtener_inscripciones`, `buscar_en_documentos`, `obtener_plan_de_estudios` y `obtener_materias_faltantes`) siguen patrones análogos y se documentan completas en el Anexo A. Vale la pena destacar el diseño de `obtener_materias_faltantes`, que resuelve la consulta *"¿qué me falta para recibirme?"* cruzando el plan de la carrera con la historia académica del alumno y calculando en la propia capa SQL los totales de aprobadas, faltantes y el porcentaje de avance. Esto evita delegar la aritmética al modelo, que en el tamaño 8B es propenso a errores de cálculo.
+**Herramienta 5: `obtener_plan_de_estudios`**
+
+Devuelve el plan completo de la carrera del alumno, sin consideraciones sobre su historial. Contrato:
+
+- **Firma:** `obtener_plan_de_estudios(ctx: SessionContext) -> list[TextContent]`
+- **Parámetros del modelo:** ninguno.
+- **Entrada efectiva:** `id_carrera` del alumno.
+- **Consulta:** `SELECT` sobre `materias` filtrado por `id_carrera`, ordenado por `anio_plan, cuatrimestre, nombre`.
+- **Salida:** `carrera, total_materias` y la lista `materias` (cada una con `nombre, anio_plan, cuatrimestre, carga_horaria`).
+
+**Herramienta 6: `obtener_materias_faltantes`**
+
+Resuelve la consulta *"¿qué me falta para recibirme?"* cruzando el plan de la carrera con la historia académica del alumno y calculando en la propia capa SQL los totales de aprobadas, faltantes y el porcentaje de avance. Esto evita delegar la aritmética al modelo, que en el tamaño 8B es propenso a errores de cálculo. Contrato:
+
+- **Firma:** `obtener_materias_faltantes(ctx: SessionContext) -> list[TextContent]`
+- **Parámetros del modelo:** ninguno.
+- **Entradas efectivas:** `ctx.id_alumno` y `id_carrera` del alumno.
+- **Consulta:** diferencia entre el plan de la carrera y las materias con estado `aprobada`/`promocionada` en `historia_academica`; sobre el total resultante se computan los agregados `total_plan`, `aprobadas`, `faltantes` y `porcentaje_completado` (redondeado a un decimal). A diferencia de `consultar_materias_disponibles`, aquí se incluyen también las materias con correlativas pendientes.
+- **Salida:** `total_plan, aprobadas, faltantes, porcentaje_completado` y la lista `materias` (cada una con `nombre, anio_plan, cuatrimestre, carga_horaria`).
+
+**Herramienta 7: `buscar_en_documentos`**
+
+Única herramienta vectorial del catálogo. Recupera fragmentos relevantes del corpus RAG de documentos institucionales cuando la respuesta no puede obtenerse a partir del resto de herramientas. Contrato:
+
+- **Firma:** `buscar_en_documentos(ctx: SessionContext, consulta_semantica: str) -> list[TextContent]`
+- **Parámetros del modelo:** `consulta_semantica: str` (texto libre en lenguaje natural).
+- **Entrada efectiva:** embedding de 768 dimensiones generado por `generar_embedding(consulta_semantica)` (sección 5.3.2).
+- **Consulta:** búsqueda ANN sobre `documentos_fragmentos` usando el operador de distancia coseno `<=>` — `WHERE embedding <=> $1 <= 0.75 ORDER BY embedding <=> $1 LIMIT 5`. El umbral de 0.75 descarta fragmentos poco relevantes.
+- **Salida por fragmento:** `documento, seccion, contenido, distancia, metadata`.
+- **Salida vacía:** `"No se encontró información relevante en los documentos institucionales."`
 
 #### 5.3.4. Mecanismo de Inyección de Identidad
 
