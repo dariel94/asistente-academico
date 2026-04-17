@@ -81,6 +81,7 @@ async def _ollama_chat(messages: list[dict], stream: bool = False, tools=None):
         "messages": messages,
         "stream": stream,
         "web_search": False,
+        "options": {"num_ctx": 16384},
     }
     if tools:
         body["tools"] = tools

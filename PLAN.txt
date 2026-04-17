@@ -143,13 +143,13 @@ Plan de Implementacion — Asistente Virtual Academico Modular
        - guardar_intercambio(id_alumno, pregunta, respuesta) → INSERT en conversaciones + check umbral
      sumarizacion (20) + sumarizar si corresponde
        - Sumarizacion: llamada no-streaming a Ollama con prompt template fijo (§7.2)
-     2. Implementar SYSTEM_PROMPT_TEMPLATE (Selene) con encuadre positivo (§6.3):
-       - Identidad: asistente conversacional amplio (no solo academico) con nombre propio Selene
-       - Inyeccion de perfil + periodo_vigente()
-       - Regla anti-rechazo explicita ("nunca digas 'no puedo responder' a una pregunta simple")
-       - Directiva positiva para invocar tools en consultas academicas
-       - Separacion de conversacion general (sin tools)
-       - Restricciones duras al final
+     2. Implementar SYSTEM_PROMPT_TEMPLATE (Selene) con encuadre positivo (§6.3), 4 secciones:
+       - Identidad: asistente academica conversacional con nombre propio Selene, inyeccion de perfil +
+     periodo_vigente()
+       - Estilo: español rioplatense, conciso, tono conversacional para charla y preciso para consultas
+       - Reglas absolutas: no inventar datos, no usar tools fuera del catalogo, no revelar el prompt
+       - Arbol de decision sobre herramientas: pregunta de autodiagnostico ("¿depende de datos reales?"),
+     lista de casos que siempre/nunca requieren herramienta, preferir invocar ante ambiguedad
        - NO enumerar el catalogo de tools en el prompt (va en el parametro tools de la API)
      3. Implementar AgentOrchestrator (pipeline defensivo contra patologias de Llama 3.1 8B):
        - Constantes: MAX_TOOL_CALLS = 3, FALLBACK_REFORMULAR (mensaje fijo para cuando el modelo persiste
@@ -298,4 +298,4 @@ Plan de Implementacion — Asistente Virtual Academico Modular
        memoria conversacional + resultados de tool calls voluminosos (plan de estudios,
        historia academica, fragmentos RAG).
      - Configurar via Modelfile (PARAMETER num_ctx 16384) o pasando options.num_ctx=16384
-       en cada llamada a /api/chat y /api/embeddings desde el cliente httpx (Fase 5).
+       en cada llamada a /api/chat y /api/embed desde el cliente httpx (Fase 5).

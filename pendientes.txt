@@ -1,9 +1,16 @@
-agregar promps de las tools a la tesis y a la spec
-sacar el punto 5.1. Stack Tecnológico y Entorno de Ejecución de la tesis y llevar esa información a cada capa de la implementación
-llevar sección RAG como trabajo futuro, junto con tablas y extensiones vectoriales, ingesta de pdfs y todo lo relacionado
 armar set de pruebas para el punto 6 y ejecutarlo (con logs de ollama y el backend)
 armar conclusiones
 ver referencias al anexo en tesis.md (hace falta un anexo?)
+agregar graficos, imagenes, diagramas de flujo, modelos, etc
+crear readme para el proyecto
+hacer que el asistente muestre las herramientas que esta utilizando
 
 
+ 5. "SDK oficial de MCP" vs implementacion custom
 
+  - Tesis (seccion 5.3): "Se implementa utilizando el SDK oficial de MCP para Python"
+  - Codigo real (app/mcp/server.py): La clase MCPServer es una implementacion propia (un dict de
+  funciones con register/dispatch), no usa ningun SDK de MCP. No hay ninguna dependencia de MCP SDK en
+   el proyecto.
+
+  Esta es una discrepancia significativa.

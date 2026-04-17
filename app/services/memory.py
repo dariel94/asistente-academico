@@ -73,9 +73,9 @@ class MemoryManager:
             id_alumno,
         )
         if count > UMBRAL_SUMARIZACION:
-            await self._sumarizar(id_alumno)
+            await self._sumarizar_antiguos(id_alumno)
 
-    async def _sumarizar(self, id_alumno: int) -> None:
+    async def _sumarizar_antiguos(self, id_alumno: int) -> None:
         # Obtener mensajes fuera de la ventana (los más antiguos)
         rows = await self._pool.fetch(
             """

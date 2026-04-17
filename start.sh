@@ -7,6 +7,11 @@ set -e
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 PIDS=()
 
+# Agregar PostgreSQL al PATH si existe en la ubicación estándar
+for pgdir in "/c/Program Files/PostgreSQL"/*/bin; do
+    [ -d "$pgdir" ] && export PATH="$pgdir:$PATH" && break
+done
+
 cleanup() {
     echo ""
     echo "Deteniendo servicios..."
@@ -46,7 +51,7 @@ fi
 # ============================================
 # 2. Crear DB y ejecutar esquema si es necesario
 # ============================================
-DB_NAME="asistente"
+DB_NAME="asistente_academico"
 DB_USER="postgres"
 DB_PASS="admin"
 DB_HOST="localhost"

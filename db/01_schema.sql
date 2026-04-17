@@ -1,5 +1,5 @@
 -- Esquema completo del Asistente Virtual Académico
--- PostgreSQL 16+ con extensión pgvector
+-- PostgreSQL 18+ con extensión pgvector
 
 -- ============================================
 -- Extensiones

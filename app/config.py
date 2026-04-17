@@ -1,7 +1,7 @@
 import os
 
 DATABASE_URL: str = os.getenv(
-    "DATABASE_URL", "postgresql://postgres:admin@localhost:5432/asistente"
+    "DATABASE_URL", "postgresql://postgres:admin@localhost:5432/asistente_academico"
 )
 
 JWT_SECRET: str = os.getenv("JWT_SECRET", "dev-secret-key-change-in-production-32chars!")
