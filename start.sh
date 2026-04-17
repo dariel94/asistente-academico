@@ -58,6 +58,7 @@ DB_HOST="localhost"
 DB_PORT="5432"
 
 export PGPASSWORD="$DB_PASS"
+export PGCLIENTENCODING=UTF8
 
 if command -v psql &>/dev/null; then
     # Crear la base si no existe
@@ -66,7 +67,7 @@ if command -v psql &>/dev/null; then
 
     if [ "$DB_EXISTS" != "1" ]; then
         info "Creando base de datos '$DB_NAME'..."
-        psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -c "CREATE DATABASE $DB_NAME;" 2>/dev/null
+        psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -c "CREATE DATABASE $DB_NAME ENCODING 'UTF8';" 2>/dev/null
         info "Ejecutando esquema (01_schema.sql)..."
         psql -U "$DB_USER" -h "$DB_HOST" -p "$DB_PORT" -d "$DB_NAME" -f "$ROOT/db/01_schema.sql"
         if [ -f "$ROOT/db/02_seed.sql" ]; then

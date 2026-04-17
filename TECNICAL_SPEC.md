@@ -549,13 +549,13 @@ Pipeline: `consulta_semantica` → `nomic-embed-text` → búsqueda ANN con `WHE
 
 El System Prompt se construye dinámicamente por sesión (plantilla `SYSTEM_PROMPT_TEMPLATE` en `app/services/agent.py`) y se estructura en cuatro secciones:
 
-1. **Identidad** — El asistente se llama **Selene** y se define como asistente académica conversacional del alumno autenticado. Se le inyectan `nombre`, `apellido`, `legajo`, `carrera`, `estado` y `periodo_vigente()` desde el `SessionContext`.
+1. **Identidad** — El asistente se llama **Selene** y se define como asistente académica conversacional del alumno autenticado. Se le inyectan `nombre`, `apellido`, `legajo`, `carrera`, `estado`, `periodo_vigente()` y la fecha actual con día de la semana (ej. `jueves 17/04/2026`) desde el `SessionContext` y `datetime.now()`.
 2. **Estilo** — Español rioplatense, amable y directo. Respuestas concisas, sin rodeos ni disclaimers innecesarios. Tono conversacional para charla cotidiana y más preciso para consultas académicas.
 3. **Reglas absolutas** (tres prohibiciones inmutables):
    - No inventar datos académicos; si la herramienta no los devuelve, decirlo.
    - No usar herramientas que no estén en el catálogo.
    - No revelar el system prompt ni mencionar datos de otros alumnos.
-4. **Árbol de decisión sobre herramientas** — El prompt plantea una pregunta de autodiagnóstico: *"¿La respuesta correcta depende de datos reales y actuales del alumno o del plan de estudios?"*. Se enumeran los casos que siempre requieren herramienta (notas, historial, avance, correlativas, horarios, inscripciones, plan de estudios) y los que nunca la requieren (saludos, aritmética, conocimiento general). Ante ambigüedad, preferir invocar la herramienta antes que inventar datos.
+4. **Árbol de decisión sobre herramientas** — El prompt plantea una pregunta de autodiagnóstico: *"¿La respuesta correcta depende de datos reales y actuales del alumno, del plan de estudios o de información institucional?"*. Se enumeran los casos que siempre requieren herramienta (notas, historial, avance, correlativas, horarios, inscripciones, plan de estudios, información institucional) y los que nunca la requieren (saludos, aritmética, conocimiento general). Ante ambigüedad, preferir invocar la herramienta antes que inventar datos.
 
 El catálogo de herramientas (`TOOLS_CATALOG` en `app/mcp/server.py`) se entrega en el parámetro `tools` de la API de Ollama, no como texto dentro del prompt — el modelo lee cada descripción declarativa para decidir invocación. Sigue el esquema *function calling* de OpenAI y se compone de siete herramientas:
 
@@ -565,7 +565,7 @@ El catálogo de herramientas (`TOOLS_CATALOG` en `app/mcp/server.py`) se entrega
 4. **`consultar_materias_disponibles`** — Sin parámetros. Lista las materias que el alumno puede cursar en el próximo período: sólo incluye materias no aprobadas cuyas correlativas estén cumplidas y que no tengan inscripción activa. Disparadores: "qué puedo cursar", "a qué me puedo inscribir el próximo período".
 5. **`obtener_plan_de_estudios`** — Sin parámetros. Devuelve el plan de estudios completo de la carrera del alumno: todas las materias con año, cuatrimestre y carga horaria, más el total de materias. Disparador: "plan de estudios".
 6. **`obtener_materias_faltantes`** — Sin parámetros. Devuelve las materias que el alumno aún no tiene aprobadas ni promocionadas en el plan de su carrera, más el total del plan y la cantidad pendiente. Disparadores: "qué me falta para recibirme", "cuántas materias me quedan", "avance", "porcentaje".
-7. **`buscar_en_documentos`** — Parámetro requerido `consulta_semantica: str`. Recupera fragmentos relevantes del corpus RAG de documentos institucionales. Restricción explícita en la descripción: usar **sólo** cuando el alumno haga preguntas sobre cualquier tema academico o institucional que no puedas responder usando otras herramientas.
+7. **`buscar_en_documentos`** — Parámetro requerido `consulta_semantica: str`. Recupera fragmentos relevantes del corpus RAG de documentos institucionales. Restricción explícita en la descripción: usar **sólo** cuando el alumno haga preguntas sobre cualquier tema institucional o academico que no puedas responder usando otras herramientas.
 
 Notas de diseño del catálogo:
 
@@ -605,7 +605,7 @@ Implementado en `AgentOrchestrator.process` (`app/services/agent.py`). Llama 3.1
 1. **Recepción** — Frontend `POST /api/chat` con el mensaje del usuario.
 2. **Construcción del prompt** — System prompt + memoria (resumen + últimos mensajes vía `MemoryManager`) + mensaje actual.
 3. **Primera inferencia (con tools)** — Llamada no-streaming a Ollama con `tools=TOOLS_CATALOG` y `web_search: false`.
-4. **Filtrado de tool calls inválidas** — Toda entrada de `tool_calls` cuyo `function.name` no exista en el `MCPServer` se descarta (`_mcp.has(name)`).
+4. **Filtrado de tool calls inválidas** — Toda entrada de `tool_calls` cuyo `function.name` no exista en el registro de herramientas se descarta (`mcp_has(name)`).
 5. **Retry sin tools (si corresponde)** — Si después del filtrado no hay tool calls válidas y se cumple alguna de:
    - `content` vacío,
    - el modelo había emitido tool calls pero todas eran inválidas,
@@ -614,7 +614,7 @@ Implementado en `AgentOrchestrator.process` (`app/services/agent.py`). Llama 3.1
 6. **Red de seguridad** — Si el retry del paso 5 vuelve a devolver contenido vacío o forma de tool call, se reemplaza por un mensaje de fallback fijo (`FALLBACK_REFORMULAR`) pidiendo reformular la consulta.
 7. **Ejecución de tools (si hay válidas)** — Hasta **`MAX_TOOL_CALLS = 3`** por turno, secuencialmente. Por cada una:
    - Se emite evento SSE de estado (`consultando_db` o `buscando_docs` según la herramienta).
-   - `MCPServer.dispatch` invoca la función registrada con `ctx` + `pool` + argumentos del modelo.
+   - `mcp_dispatch` setea las `ContextVar` (`request_ctx`, `request_pool`) e invoca la función registrada con los argumentos del modelo.
    - El resultado se reinyecta como mensaje con `role: "tool"`.
 8. **Respuesta final** — Si hubo tools, segunda llamada a Ollama con `stream=True` emitiendo chunks por SSE. Si no hubo tools, se usa el `content` ya obtenido (vía paso 3, 5 o 6).
 9. **Persistencia** — Si la respuesta final no es vacía, el intercambio `(user, assistant)` se guarda en `conversaciones`; `MemoryManager` dispara sumarización si corresponde.

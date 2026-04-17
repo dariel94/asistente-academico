@@ -1,7 +1,18 @@
+from contextvars import ContextVar
 from datetime import datetime
 from typing import Any, Callable, Coroutine
 
+from mcp.server.fastmcp import FastMCP
+
 from app.models.schemas import SessionContext
+
+# ─── Servidor MCP (SDK oficial) ─────────────────────────────────────────────
+mcp_server = FastMCP("asistente-academico-mcp")
+
+# Context variables para inyectar dependencias por request sin exponerlas
+# como parámetros MCP.  Se setean en dispatch() antes de invocar la tool.
+request_ctx: ContextVar[SessionContext] = ContextVar("request_ctx")
+request_pool: ContextVar[Any] = ContextVar("request_pool")
 
 
 def periodo_vigente() -> str:
@@ -10,7 +21,38 @@ def periodo_vigente() -> str:
     return f"{now.year}-{sufijo}"
 
 
-# Catálogo de tools en formato OpenAI para enviar a Ollama
+# ─── Registro y despacho in-process ─────────────────────────────────────────
+# El orquestador llama a las herramientas directamente (sin transporte MCP),
+# por lo que mantenemos un dict nombre→función para despacho rápido.
+
+ToolFunc = Callable[..., Coroutine[Any, Any, str]]
+_dispatch: dict[str, ToolFunc] = {}
+
+
+def mcp_tool(name: str):
+    """Decorador que registra una herramienta tanto en el servidor MCP (SDK)
+    como en el dict de despacho interno para invocación in-process."""
+    def decorator(func: ToolFunc) -> ToolFunc:
+        mcp_server.tool(name=name)(func)
+        _dispatch[name] = func
+        return func
+    return decorator
+
+
+def has(name: str) -> bool:
+    return name in _dispatch
+
+
+async def dispatch(name: str, args: dict, ctx: SessionContext, pool) -> str:
+    func = _dispatch.get(name)
+    if not func:
+        return f"Herramienta '{name}' no encontrada."
+    request_ctx.set(ctx)
+    request_pool.set(pool)
+    return await func(**args)
+
+
+# ─── Catálogo de tools en formato OpenAI para enviar a Ollama ───────────────
 TOOLS_CATALOG = [
     {
         "type": "function",
@@ -103,7 +145,7 @@ TOOLS_CATALOG = [
             "name": "buscar_en_documentos",
             "description": (
                 "Busca información en los documentos institucionales. Usar SOLO cuando el alumno haga preguntas "
-                "sobre cualquier tema academico o institucional que no puedas responder usando otras herramientas."
+                "sobre cualquier tema institucional o academico que no puedas responder usando otras herramientas."
             ),
             "parameters": {
                 "type": "object",
@@ -116,27 +158,5 @@ TOOLS_CATALOG = [
                 "required": ["consulta_semantica"],
             },
         },
-    }
+    },
 ]
-
-
-ToolFunc = Callable[..., Coroutine[Any, Any, Any]]
-
-
-class MCPServer:
-    def __init__(self):
-        self._tools: dict[str, ToolFunc] = {}
-
-    def register(self, name: str, func: ToolFunc) -> None:
-        self._tools[name] = func
-
-    def has(self, name: str) -> bool:
-        return name in self._tools
-
-    async def dispatch(
-        self, tool_name: str, args: dict, ctx: SessionContext, pool
-    ) -> str:
-        func = self._tools.get(tool_name)
-        if not func:
-            return f"Herramienta '{tool_name}' no encontrada."
-        return await func(ctx=ctx, pool=pool, **args)

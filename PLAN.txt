@@ -95,16 +95,16 @@ Plan de Implementacion — Asistente Virtual Academico Modular
      Objetivo: Las 7 herramientas MCP implementadas y testeables de forma aislada.
 
      Archivos a crear:
-     - app/mcp/server.py — clase MCPServer, registro de herramientas, dispatch, TOOLS_CATALOG
+     - app/mcp/server.py — servidor FastMCP (SDK oficial), decorador mcp_tool, dispatch via contextvars, TOOLS_CATALOG
      - app/mcp/tools.py — implementacion de las 7 herramientas (§5.4.1–5.4.7)
 
      Tareas:
      1. Implementar periodo_vigente() como funcion utilitaria (§5.1)
-     2. Implementar MCPServer con:
-       - registro de herramientas
-       - metodo has(name) para verificar existencia (usado por el orquestador para filtrar tool calls
+     2. Implementar servidor MCP con SDK oficial (FastMCP) con:
+       - decorador mcp_tool(name) que registra en FastMCP y en dict _dispatch
+       - funcion has(name) para verificar existencia (usado por el orquestador para filtrar tool calls
      alucinadas)
-       - metodo dispatch(tool_name, args, ctx) que ejecuta la herramienta inyectando el SessionContext
+       - funcion dispatch(name, args, ctx, pool) que setea ContextVar e invoca la herramienta
      3. Implementar obtener_historia_academica(ctx) — query parametrizada con JOIN materias+carreras, ORDER
      BY fecha DESC
      4. Implementar obtener_materia(ctx, nombre_materia) — ILIKE parcial filtrado por carrera del alumno, con
@@ -162,7 +162,7 @@ Plan de Implementacion — Asistente Virtual Academico Modular
      _looks_like_tool_call(content)) → Reintentar sin tools
        - Red de seguridad: si el reintento todavia devuelve contenido vacio o con forma de tool call,
      reemplazar por FALLBACK_REFORMULAR
-       - Si hay tool_calls validas: ejecutar secuencialmente via MCPServer (max 3), emitir eventos de estado,
+       - Si hay tool_calls validas: ejecutar secuencialmente via mcp_dispatch (max 3), emitir eventos de estado,
      reinyectar resultados como role=tool
        - Llamada final (streaming) a Ollama si hubo tools, sino usar content ya obtenido → yield chunks
        - Manejo de errores de Ollama (timeout, conexion)

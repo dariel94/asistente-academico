@@ -1,11 +1,15 @@
 import json
+import logging
+from datetime import datetime
 from typing import AsyncGenerator
 
 import httpx
 
+logger = logging.getLogger(__name__)
+
 from app import config
-from app.mcp.server import MCPServer, TOOLS_CATALOG, periodo_vigente
-from app.mcp.tools import register_tools
+from app.mcp.server import has as mcp_has, dispatch as mcp_dispatch, TOOLS_CATALOG, periodo_vigente
+import app.mcp.tools  # noqa: F401 — registra las tools via decoradores
 from app.models.schemas import SessionContext
 from app.services.memory import MemoryManager
 
@@ -23,7 +27,7 @@ def _looks_like_tool_call(text: str) -> bool:
 SYSTEM_PROMPT_TEMPLATE = """
 # Identidad
 Sos Selene, asistente académica conversacional de {nombre} {apellido}
-(legajo {legajo} | carrera {carrera} | estado {estado}. para el período {periodo}).
+(legajo {legajo} | carrera {carrera} | estado {estado} | período vigente {periodo} | hoy es {fecha}).
 
 # Estilo
 - Español rioplatense, amable y directo.
@@ -38,7 +42,7 @@ Sos Selene, asistente académica conversacional de {nombre} {apellido}
 
 # Cómo decidir si usar una herramienta
 Antes de responder, hacete esta pregunta:
-  ¿La respuesta correcta depende de datos reales y actuales del alumno o del plan de estudios?
+  ¿La respuesta correcta depende de datos reales y actuales del alumno, del plan de estudios o de información institucional?
 
   → SÍ → Invocá la herramienta correspondiente. No respondas de memoria.
   → NO → Respondé directamente con texto.
@@ -48,6 +52,7 @@ Casos que SIEMPRE requieren herramienta:
 - Avance de carrera o porcentaje completado
 - Correlativas, comisiones o plan de estudios
 - Horarios e inscripciones actuales
+- Informacion institucional
 
 Casos que NUNCA requieren herramienta:
 - Saludos y conversación general
@@ -59,7 +64,11 @@ No hace falta explicarle al alumno que estás consultando el sistema.
 
 """
 
+_DIAS = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+
 def _build_system_prompt(ctx: SessionContext) -> str:
+    now = datetime.now()
+    fecha = f"{_DIAS[now.weekday()]} {now.strftime('%d/%m/%Y')}"
     return SYSTEM_PROMPT_TEMPLATE.format(
         nombre=ctx.perfil.nombre,
         apellido=ctx.perfil.apellido,
@@ -67,12 +76,9 @@ def _build_system_prompt(ctx: SessionContext) -> str:
         carrera=ctx.perfil.carrera,
         estado=ctx.perfil.estado,
         periodo=periodo_vigente(),
+        fecha=fecha,
     )
 
-
-# Singleton MCP server
-_mcp = MCPServer()
-register_tools(_mcp)
 
 
 async def _ollama_chat(messages: list[dict], stream: bool = False, tools=None):
@@ -143,7 +149,7 @@ class AgentOrchestrator:
             # Filtrar tool calls inválidas (el modelo a veces inventa nombres)
             tool_calls = [
                 tc for tc in raw_tool_calls
-                if _mcp.has(tc.get("function", {}).get("name", ""))
+                if mcp_has(tc.get("function", {}).get("name", ""))
             ]
 
             # 3. Si no hubo tool calls válidas o la respuesta está vacía o parece
@@ -185,7 +191,7 @@ class AgentOrchestrator:
                         }
 
                     # Ejecutar herramienta
-                    result = await _mcp.dispatch(
+                    result = await mcp_dispatch(
                         tool_name, tool_args, ctx, self._pool
                     )
 

@@ -3,8 +3,7 @@ import json
 import httpx
 
 from app import config
-from app.mcp.server import MCPServer, periodo_vigente
-from app.models.schemas import SessionContext
+from app.mcp.server import mcp_tool, request_ctx, request_pool, periodo_vigente
 
 
 def _json_result(data) -> str:
@@ -13,7 +12,11 @@ def _json_result(data) -> str:
 
 # ─── 1. obtener_historia_academica ───────────────────────────────────────────
 
-async def obtener_historia_academica(ctx: SessionContext, pool, **_kwargs) -> str:
+@mcp_tool("obtener_historia_academica")
+async def obtener_historia_academica() -> str:
+    """Obtiene el historial académico completo del alumno autenticado."""
+    ctx = request_ctx.get()
+    pool = request_pool.get()
     rows = await pool.fetch(
         """
         SELECT m.nombre AS materia, ha.estado,
@@ -35,15 +38,16 @@ async def obtener_historia_academica(ctx: SessionContext, pool, **_kwargs) -> st
 
 # ─── 2. obtener_materia ──────────────────────────────────────────────────────
 
-async def obtener_materia(
-    ctx: SessionContext, pool, nombre_materia: str = "", **_kwargs
-) -> str:
-    # Obtener carrera del alumno
+@mcp_tool("obtener_materia")
+async def obtener_materia(nombre_materia: str = "") -> str:
+    """Busca información detallada de una materia por nombre."""
+    ctx = request_ctx.get()
+    pool = request_pool.get()
+
     id_carrera = await pool.fetchval(
         "SELECT id_carrera FROM alumnos WHERE id_alumno = $1", ctx.id_alumno
     )
 
-    # Buscar materias por coincidencia parcial dentro de la carrera
     materias = await pool.fetch(
         """
         SELECT id_materia, nombre, anio_plan, cuatrimestre, carga_horaria
@@ -58,7 +62,6 @@ async def obtener_materia(
 
     result = []
     for mat in materias:
-        # Correlativas
         correlativas = await pool.fetch(
             """
             SELECT m.nombre, co.tipo
@@ -69,7 +72,6 @@ async def obtener_materia(
             mat["id_materia"],
         )
 
-        # Comisiones + horarios
         comisiones = await pool.fetch(
             """
             SELECT id_comision, nombre, periodo, aula, sede, profesor
@@ -117,7 +119,11 @@ async def obtener_materia(
 
 # ─── 3. obtener_inscripciones ─────────────────────────────────────────────
 
-async def obtener_inscripciones(ctx: SessionContext, pool, **_kwargs) -> str:
+@mcp_tool("obtener_inscripciones")
+async def obtener_inscripciones() -> str:
+    """Devuelve las inscripciones vigentes del alumno."""
+    ctx = request_ctx.get()
+    pool = request_pool.get()
     periodo = periodo_vigente()
     rows = await pool.fetch(
         """
@@ -141,9 +147,11 @@ async def obtener_inscripciones(ctx: SessionContext, pool, **_kwargs) -> str:
 
 # ─── 4. consultar_materias_disponibles ───────────────────────────────────────
 
-async def consultar_materias_disponibles(
-    ctx: SessionContext, pool, **_kwargs
-) -> str:
+@mcp_tool("consultar_materias_disponibles")
+async def consultar_materias_disponibles() -> str:
+    """Lista las materias que el alumno puede cursar en el próximo período."""
+    ctx = request_ctx.get()
+    pool = request_pool.get()
     periodo = periodo_vigente()
     id_carrera = await pool.fetchval(
         "SELECT id_carrera FROM alumnos WHERE id_alumno = $1", ctx.id_alumno
@@ -152,7 +160,6 @@ async def consultar_materias_disponibles(
     rows = await pool.fetch(
         """
         WITH aprobadas AS (
-            -- Materias con el mejor estado del alumno
             SELECT DISTINCT ON (id_materia) id_materia, estado
             FROM historia_academica
             WHERE id_alumno = $1
@@ -174,17 +181,14 @@ async def consultar_materias_disponibles(
         SELECT m.id_materia, m.nombre, m.anio_plan, m.cuatrimestre, m.carga_horaria
         FROM materias m
         WHERE m.id_carrera = $3
-          -- No aprobada ni promocionada
           AND NOT EXISTS (
               SELECT 1 FROM aprobadas a
               WHERE a.id_materia = m.id_materia
                 AND a.estado IN ('aprobada', 'promocionada')
           )
-          -- No inscripta actualmente
           AND NOT EXISTS (
               SELECT 1 FROM inscriptas ins WHERE ins.id_materia = m.id_materia
           )
-          -- Todas las correlativas cumplidas
           AND NOT EXISTS (
               SELECT 1 FROM correlativas co
               WHERE co.id_materia = m.id_materia
@@ -255,7 +259,11 @@ async def consultar_materias_disponibles(
 
 # ─── 5. obtener_materias_faltantes ──────────────────────────────────────────
 
-async def obtener_materias_faltantes(ctx: SessionContext, pool, **_kwargs) -> str:
+@mcp_tool("obtener_materias_faltantes")
+async def obtener_materias_faltantes() -> str:
+    """Devuelve las materias pendientes y el porcentaje de avance."""
+    ctx = request_ctx.get()
+    pool = request_pool.get()
     id_carrera = await pool.fetchval(
         "SELECT id_carrera FROM alumnos WHERE id_alumno = $1", ctx.id_alumno
     )
@@ -301,7 +309,11 @@ async def obtener_materias_faltantes(ctx: SessionContext, pool, **_kwargs) -> st
 
 # ─── 6. obtener_plan_de_estudios ────────────────────────────────────────────
 
-async def obtener_plan_de_estudios(ctx: SessionContext, pool, **_kwargs) -> str:
+@mcp_tool("obtener_plan_de_estudios")
+async def obtener_plan_de_estudios() -> str:
+    """Devuelve el plan de estudios completo de la carrera del alumno."""
+    ctx = request_ctx.get()
+    pool = request_pool.get()
     id_carrera = await pool.fetchval(
         "SELECT id_carrera FROM alumnos WHERE id_alumno = $1", ctx.id_alumno
     )
@@ -329,10 +341,11 @@ async def obtener_plan_de_estudios(ctx: SessionContext, pool, **_kwargs) -> str:
 
 # ─── 7. buscar_en_documentos ─────────────────────────────────────────────────
 
-async def buscar_en_documentos(
-    ctx: SessionContext, pool, consulta_semantica: str = "", **_kwargs
-) -> str:
-    # Generar embedding de la consulta via Ollama
+@mcp_tool("buscar_en_documentos")
+async def buscar_en_documentos(consulta_semantica: str = "") -> str:
+    """Busca información relevante en los documentos institucionales."""
+    pool = request_pool.get()
+
     async with httpx.AsyncClient(timeout=30.0) as client:
         resp = await client.post(
             f"{config.OLLAMA_BASE_URL}/api/embed",
@@ -341,7 +354,6 @@ async def buscar_en_documentos(
         resp.raise_for_status()
         embedding = resp.json()["embeddings"][0]
 
-    # Búsqueda vectorial con threshold
     rows = await pool.fetch(
         """
         SELECT documento, seccion, contenido,
@@ -370,15 +382,3 @@ async def buscar_en_documentos(
             for r in rows
         ]
     )
-
-
-# ─── Registro ────────────────────────────────────────────────────────────────
-
-def register_tools(mcp: MCPServer) -> None:
-    mcp.register("obtener_historia_academica", obtener_historia_academica)
-    mcp.register("obtener_materia", obtener_materia)
-    mcp.register("obtener_inscripciones", obtener_inscripciones)
-    mcp.register("consultar_materias_disponibles", consultar_materias_disponibles)
-    mcp.register("buscar_en_documentos", buscar_en_documentos)
-    mcp.register("obtener_materias_faltantes", obtener_materias_faltantes)
-    mcp.register("obtener_plan_de_estudios", obtener_plan_de_estudios)
