@@ -60,8 +60,8 @@ TOOLS_CATALOG = [
             "name": "obtener_historia_academica",
             "description": (
                 "Obtiene el historial académico completo del alumno autenticado: "
-                "materias cursadas con su estado, notas y período. Usar cuando el alumno pregunte "
-                "por notas, historial académico, historia académica, materias cursadas."
+                "materias cursadas con su estado, notas y período. Usar SOLO cuando el alumno pregunte "
+                "por notas, historial académico o materias cursadas."
             ),
             "parameters": {"type": "object", "properties": {}, "required": []},
         },
@@ -73,7 +73,7 @@ TOOLS_CATALOG = [
             "description": (
                 "Busca información detallada de una materia por nombre: año del plan, "
                 "cuatrimestre, carga horaria, correlativas y comisiones disponibles con "
-                "horarios. Usar cuando el alumno pregunte por una materia específica."
+                "horarios. Usar SOLO cuando el alumno pregunte por una materia específica."
             ),
             "parameters": {
                 "type": "object",
@@ -93,9 +93,9 @@ TOOLS_CATALOG = [
             "name": "obtener_inscripciones",
             "description": (
                 "Devuelve las inscripciones vigentes del alumno: "
-                "materia, comisión, día, horario, aula, sede y profesor. Usar cuando "
-                "pregunte por sus horarios, agenda, qué materias está cursando (en curso), "
-                "a qué se inscribió o qué tiene este cuatrimestre."
+                "materia, comisión, día, horario, aula, sede y profesor. Usar SOLO cuando el alumno "
+                "pregunte sus horarios de cursada, agenda académica semanal, materias que está cursando, "
+                "inscripciones o materias a las que esta inscripto en el periodo actual."
             ),
             "parameters": {"type": "object", "properties": {}, "required": []},
         },
@@ -107,7 +107,7 @@ TOOLS_CATALOG = [
             "description": (
                 "Lista las materias que el alumno puede cursar en el próximo período: "
                 "solo incluye materias no aprobadas cuyas correlativas estén cumplidas "
-                "y que no tengan inscripción activa. Usar cuando el alumno pregunte "
+                "y que no tengan inscripción activa. Usar SOLO cuando el alumno pregunte "
                 "qué materias tiene disponibles para cursar o a que materias puede inscribirse el proximo periodo."
             ),
             "parameters": {"type": "object", "properties": {}, "required": []},
@@ -120,7 +120,7 @@ TOOLS_CATALOG = [
             "description": (
                 "Obtiene el plan de estudios completo de la carrera del alumno: "
                 "todas las materias con año, cuatrimestre y carga horaria, más el "
-                "total de materias. Usar cuando el alumno pida el plan de estudios."
+                "total de materias. Usar SOLO cuando el alumno pida informacion sobre el plan de estudios."
             ),
             "parameters": {"type": "object", "properties": {}, "required": []},
         },
@@ -132,9 +132,9 @@ TOOLS_CATALOG = [
             "description": (
                 "Devuelve las materias que el alumno aún no tiene aprobadas ni "
                 "promocionadas en el plan de su carrera, más el total del plan y "
-                "la cantidad pendiente. Usar cuando pregunte qué le falta para "
-                "recibirse, para terminar la carrera, cuántas materias le quedan "
-                "o su avance/porcentaje."
+                "la cantidad pendiente. Usar SOLO cuando el alumno consulte por las materias que le faltan para "
+                "recibirse, cuántas materias le quedan por cursar "
+                "o su avance/porcentaje en la carrera."
             ),
             "parameters": {"type": "object", "properties": {}, "required": []},
         },
@@ -144,8 +144,8 @@ TOOLS_CATALOG = [
         "function": {
             "name": "buscar_en_documentos",
             "description": (
-                "Busca información en los documentos institucionales. Usar SOLO cuando el alumno haga preguntas "
-                "sobre cualquier tema institucional o academico que no puedas responder usando otras herramientas."
+                "Busca información institucional o sobre la universidad en documentos. Usar SOLO cuando el alumno haga una pregunta "
+                "sobre un tema institucional/académico o sobre a la universidad que no puedas responder con otras herramientas. "
             ),
             "parameters": {
                 "type": "object",

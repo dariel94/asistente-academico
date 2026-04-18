@@ -1,4 +1,7 @@
+import logging
+import os
 from contextlib import asynccontextmanager
+from logging.handlers import RotatingFileHandler
 
 import asyncpg
 from dotenv import load_dotenv
@@ -9,6 +12,36 @@ from app import config
 from app.routers import auth, chat
 
 load_dotenv()
+
+
+def _setup_logging() -> None:
+    os.makedirs("logs", exist_ok=True)
+    fmt = logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s")
+
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+
+    stream = logging.StreamHandler()
+    stream.setFormatter(fmt)
+    root.addHandler(stream)
+
+    file_handler = RotatingFileHandler(
+        "logs/app.log", maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"
+    )
+    file_handler.setFormatter(fmt)
+    root.addHandler(file_handler)
+
+    requests_handler = RotatingFileHandler(
+        "logs/requests.log", maxBytes=10 * 1024 * 1024, backupCount=5, encoding="utf-8"
+    )
+    requests_handler.setFormatter(fmt)
+    req_logger = logging.getLogger("asistente.request")
+    req_logger.addHandler(requests_handler)
+    req_logger.addHandler(stream)
+    req_logger.propagate = False
+
+
+_setup_logging()
 
 
 @asynccontextmanager

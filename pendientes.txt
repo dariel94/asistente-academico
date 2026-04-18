@@ -1,4 +1,4 @@
-hacer que el asistente muestre las herramientas que esta utilizando (logs) y documentarlo
+temas de concurrencia? probar varias conversaciones en simultaneo, distintos con distintos usuarios
 armar set de pruebas para el punto 6 y ejecutarlo (con logs de ollama y el backend)
 agregar graficos, imagenes, diagramas de flujo, modelos, etc
 armar conclusiones, con resultados, problemas encontrados, puntos claves

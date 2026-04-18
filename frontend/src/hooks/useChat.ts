@@ -3,7 +3,7 @@ import { sendMessage } from '../services/api';
 import type { ChatState, ChatAction, EstadoAgente, Perfil } from '../types/chat';
 
 function mensajeBienvenida(perfil: Perfil): string {
-  return `¡Hola ${perfil.nombre}! Soy **Selene**, tu asistente universitaria. Puedo ayudarte a consultar tu información académica o institucional. ¿En qué puedo ayudarte hoy?`;
+  return `¡Hola ${perfil.nombre}! Soy **Selene**, tu asistente virtual universitaria. Puedo responder consultas sobre información académica o institucional. ¿En qué puedo ayudarte hoy?`;
 }
 
 function initialState(perfil: Perfil): ChatState {
