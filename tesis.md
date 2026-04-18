@@ -10,8 +10,8 @@ Asistente Académico: Agente Conversacional con Tool Calling
 - Capítulo 2: Marco Teórico y Estado del Arte
   - 2.1. Modelos de Lenguaje Grandes (LLMs)
   - 2.2. Model Context Protocol (MCP)
-  - 2.3. RAG y Bases de Datos Vectoriales
-  - 2.4. Estrategias de Memoria Híbrida
+  - 2.3. Generación Aumentada por Recuperación (RAG) y Bases de Datos Vectoriales
+  - 2.4. Estrategias de Memoria en Agentes Conversacionales
 - Capítulo 3: Análisis de Requerimientos
   - 3.1. Requerimientos Funcionales
   - 3.2. Requerimientos No Funcionales
@@ -34,6 +34,8 @@ Asistente Académico: Agente Conversacional con Tool Calling
   - 6.2. Pruebas de Precisión en Respuestas y Tool Calling
   - 6.3. Evaluación de Rendimiento (Latencia y Consumo Local)
   - 6.4. Validación de Seguridad y Resistencia a Inyecciones
+  - 6.5. Evaluación de la Memoria Conversacional Híbrida
+  - 6.6. Pruebas de Multisesion y Concurrencia
 - Capítulo 7: Conclusiones y Trabajo Futuro
 - Anexo A: Código Fuente Completo
 
@@ -353,7 +355,7 @@ El mecanismo de comunicación entre el frontend y el backend para la entrega de 
 
 - **Unidireccionalidad del flujo:** La generación de respuestas es inherentemente unidireccional (del servidor al cliente). SSE está diseñado específicamente para este patrón, sin el overhead de un canal bidireccional completo como el que introduce WebSockets.
 - **Compatibilidad HTTP nativa:** SSE opera sobre HTTP/1.1 estándar, lo que lo hace compatible con cualquier infraestructura de proxy o balanceador de carga sin configuración adicional, facilitando el despliegue institucional.
-- **Reconexión automática:** El protocolo SSE incluye mecanismos de reconexión nativos ante interrupciones de red, garantizando que la experiencia del usuario no se vea afectada por cortes momentáneos de conectividad.
+- **Reconexión automática opcional:** La API nativa `EventSource` del navegador implementa reconexión automática ante interrupciones de red. Si bien la implementación actual utiliza `fetch` + `ReadableStream` para poder inyectar el token JWT en el header `Authorization` (algo que `EventSource` no permite), el protocolo SSE habilita esta capacidad a futuro sin cambios estructurales en el backend.
 
 #### 4.5.4. Indicadores de Estado y Transparencia Operativa
 
@@ -365,7 +367,7 @@ Este diseño cumple una doble función: mejora la experiencia de usuario al gest
 
 ## Capítulo 5: Implementación y Desarrollo
 
-#### 5.1. Entorno de Ejecucion y Hardware
+### 5.1. Entorno de Ejecucion y Hardware
 
 El desarrollo y las pruebas funcionales del sistema se realizaron sobre una estación de trabajo personal con sistema Windows cuyas especificaciones se resumen en la Tabla 5.1. Esta configuración debe interpretarse como un entorno de referencia para los tiempos de respuesta reportados en el Capítulo 6, y no como un requisito mínimo de despliegue. El componente crítico es la GPU, ya que es el factor que mas condiciona a la elección del tamaño de los modelos de Ollama.
 
@@ -556,19 +558,15 @@ En esta arquitectura, el servidor MCP se integra directamente en el mismo proces
 
 Al arrancar FastAPI se instancia un servidor `FastMCP` del SDK oficial de MCP para Python (`asistente-academico-mcp`) y se inicializa un pool de conexiones `asyncpg` compartido (con `min_size=2`, `max_size=10`) contra la base de datos. La cadena de conexión se externaliza a `app/config.py` leyendo la variable de entorno `DATABASE_URL`, evitando credenciales hardcodeadas en el código fuente.
 
-Dado que el orquestador consume las herramientas in-process (sin transporte JSON-RPC), se implementa un patrón de **doble registro**: un decorador `mcp_tool(name)` que inscribe cada función tanto en el servidor `FastMCP` (para exposición MCP estándar) como en un diccionario interno `_dispatch` para invocación directa. Las dependencias por request —el contexto de sesión (`SessionContext`) y el pool de conexiones— se inyectan mediante `contextvars` de Python, lo que evita exponer estos valores como parámetros MCP visibles para el modelo de lenguaje. La implementación completa se encuentra en el Anexo A.4.
+Dado que el orquestador consume las herramientas in-process (sin transporte JSON-RPC), se implementa un patrón de **doble registro**: un decorador `mcp_tool(name)` que inscribe cada función tanto en el servidor `FastMCP` como en un diccionario interno `_dispatch` para invocación directa. Cabe aclarar que, en la configuración actual, el servidor `FastMCP` no se arranca con ningún transporte externo (stdio, SSE o HTTP), por lo que la inscripción en el SDK oficial queda lista como andamio para una eventual exposición MCP a consumidores externos sin modificar las definiciones de las herramientas. Las dependencias por request —el contexto de sesión (`SessionContext`) y el pool de conexiones— se inyectan mediante `contextvars` de Python, lo que evita exponer estos valores como parámetros MCP visibles para el modelo de lenguaje. La implementación completa se encuentra en el Anexo A.4.
 
 #### 5.3.2. Funciones Auxiliares
 
-Antes de definir las herramientas, se implementan dos funciones de soporte que son utilizadas por múltiples herramientas:
+Antes de definir las herramientas, se implementa una función de soporte utilizada por múltiples herramientas:
 
-- **`obtener_periodo_vigente() -> str`:** determina automáticamente el cuatrimestre actual a partir de la fecha del sistema, evitando que las herramientas dependan de un parámetro de período hardcodeado. Convención de salida:
+- **`periodo_vigente() -> str`:** determina automáticamente el cuatrimestre actual a partir de la fecha del sistema, evitando que las herramientas dependan de un parámetro de período hardcodeado. Convención de salida:
   - Meses 1-7 → `"<año>-1C"`
   - Meses 8-12 → `"<año>-2C"`
-- **`generar_embedding(texto: str) -> list[float]`:** centraliza la llamada HTTP a Ollama para la generación de vectores. Se reutiliza tanto por el pipeline de ingestión (sección 5.2.4) como por la herramienta de búsqueda semántica. Contrato de la llamada:
-  - Endpoint: `POST {OLLAMA_URL}/api/embed`
-  - Payload: `{"model": "nomic-embed-text", "input": texto}`
-  - Respuesta: campo `embeddings[0]` con un vector de 768 dimensiones (`list[float]`)
 
 #### 5.3.3. Creacion de Herramientas (Tools)
 
@@ -601,7 +599,7 @@ Devuelve la grilla semanal del alumno para el cuatrimestre actual. Cubre consult
 
 - **Firma:** `obtener_inscripciones() -> str`
 - **Parámetros del modelo:** ninguno.
-- **Entradas efectivas:** `ctx.id_alumno` y el período devuelto por `obtener_periodo_vigente()`.
+- **Entradas efectivas:** `ctx.id_alumno` y el período devuelto por `periodo_vigente()`.
 - **Consulta:** `JOIN` de `inscripciones` con `comisiones`, `materias` y `horarios`, filtrando por `id_alumno` y por `comisiones.periodo = periodo_vigente`, ordenado por `dia_semana, hora_inicio`.
 - **Salida por registro:** `dia_semana, hora_inicio, hora_fin, materia, comision, aula, sede, profesor`.
 
@@ -611,7 +609,7 @@ Es la herramienta más compleja del catálogo. Determina qué materias puede ins
 
 - **Firma:** `consultar_materias_disponibles() -> str`
 - **Parámetros del modelo:** ninguno.
-- **Entradas efectivas:** `ctx.id_alumno`, `id_carrera` del alumno y `periodo` (calculado por `obtener_periodo_vigente`).
+- **Entradas efectivas:** `ctx.id_alumno`, `id_carrera` del alumno y `periodo` (calculado por `periodo_vigente`).
 - **Salida por materia:** `id_materia, nombre, anio_plan, cuatrimestre, carga_horaria` más las comisiones del período vigente con sus horarios.
 
 La lógica SQL cruza tres fuentes (plan de la carrera, historia académica y correlativas) mediante tres filtros `NOT EXISTS` encadenados sobre la tabla `materias`:
@@ -651,7 +649,7 @@ Resuelve la consulta *"¿qué me falta para recibirme?"* cruzando el plan de la 
 
 - **Firma:** `buscar_en_documentos(consulta_semantica: str) -> str`
 - **Parámetros del modelo:** `consulta_semantica: str` (texto libre en lenguaje natural).
-- **Entrada efectiva:** embedding de 768 dimensiones generado por `generar_embedding(consulta_semantica)` (sección 5.3.2).
+- **Entrada efectiva:** embedding de 768 dimensiones generado mediante una llamada a `POST {OLLAMA_URL}/api/embed` con el modelo `nomic-embed-text` (campo `embeddings[0]` de la respuesta).
 - **Consulta:** búsqueda ANN sobre `documentos_fragmentos` usando el operador de distancia coseno `<=>` — `WHERE embedding <=> $1 <= 0.75 ORDER BY embedding <=> $1 LIMIT 5`. El umbral de 0.75 descarta fragmentos poco relevantes.
 - **Salida por fragmento:** `documento, seccion, contenido, distancia, metadata`.
 - **Salida vacía:** `"No se encontró información relevante en los documentos institucionales."`
@@ -999,10 +997,10 @@ pg_isready -h localhost -p 5432
 # 2. Ollama — servidor de inferencia local
 ollama serve     # expone la API en :11434
 
-# 4. Backend — FastAPI sobre Uvicorn
+# 3. Backend — FastAPI sobre Uvicorn
 uvicorn app.main:app --reload --port 8000
 
-# 5. Frontend — Vite en modo desarrollo
+# 4. Frontend — Vite en modo desarrollo
 cd frontend && npm install && npm run dev
 ```
 
@@ -1118,6 +1116,14 @@ _(Contenido pendiente)_
 _(Contenido pendiente)_
 
 ### 6.4. Validación de Seguridad y Resistencia a Inyecciones
+
+_(Contenido pendiente)_
+
+### 6.5. Evaluación de la Memoria Conversacional Híbrida
+
+_(Contenido pendiente)_
+
+### 6.6. Pruebas de Multisesión y Concurrencia
 
 _(Contenido pendiente)_
 

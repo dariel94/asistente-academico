@@ -1,5 +1,6 @@
-temas de concurrencia? probar varias conversaciones en simultaneo, distintos con distintos usuarios
+
 armar set de pruebas para el punto 6 y ejecutarlo (con logs de ollama y el backend)
+
 agregar graficos, imagenes, diagramas de flujo, modelos, etc
 armar conclusiones, con resultados, problemas encontrados, puntos claves
 ver referencias al anexo en tesis.md (hace falta un anexo?)
