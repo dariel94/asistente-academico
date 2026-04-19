@@ -1,0 +1,245 @@
+{
+  "n_casos": 27,
+  "n_corridas_totales": 81,
+  "n_corridas_validas": 80,
+  "n_corridas_con_error_runner": 1,
+  "clasificador": {
+    "TP_academica": 65,
+    "FN_academica": 0,
+    "TP_conversacion": 15,
+    "FP_academica": 0,
+    "total_corridas": 80,
+    "accuracy": 1.0,
+    "precision_academica": 1.0,
+    "recall_academica": 1.0,
+    "precision_conversacion": 1.0,
+    "recall_conversacion": 1.0
+  },
+  "tool_calling": {
+    "n_corridas_academicas": 65,
+    "n_corridas_conversacionales": 15,
+    "match_exacto": 1.0,
+    "alguna_correcta": 1.0,
+    "ninguna_invocada": 0.0,
+    "tools_de_mas_promedio": 0,
+    "no_invocaron_en_conversacion": 1.0
+  },
+  "tool_calling_por_tool": {
+    "buscar_en_documentos": {
+      "n": 9,
+      "match_exacto_rate": 1.0
+    },
+    "consultar_materias_disponibles": {
+      "n": 9,
+      "match_exacto_rate": 1.0
+    },
+    "obtener_historia_academica": {
+      "n": 12,
+      "match_exacto_rate": 1.0
+    },
+    "obtener_inscripciones": {
+      "n": 8,
+      "match_exacto_rate": 1.0
+    },
+    "obtener_materia": {
+      "n": 9,
+      "match_exacto_rate": 1.0
+    },
+    "obtener_materias_faltantes": {
+      "n": 9,
+      "match_exacto_rate": 1.0
+    },
+    "obtener_plan_de_estudios": {
+      "n": 9,
+      "match_exacto_rate": 1.0
+    }
+  },
+  "contenido": {
+    "n": 80,
+    "respuesta_correcta": 0.8875,
+    "promedio_chars_respuesta": 445.4
+  },
+  "consistencia": {
+    "n_casos": 27,
+    "intent_consistente_n_de_n": 1.0,
+    "tools_consistentes_n_de_n": 1.0,
+    "respuesta_consistente_n_de_n": 1.0,
+    "detalle": {
+      "CO-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "CO-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "CO-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "CO-04": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "CO-05": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "DI-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "DI-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "DI-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "DO-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "DO-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "DO-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "FA-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "FA-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "FA-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "FP-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "HA-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "HA-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "HA-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "IN-01": {
+        "n_runs": 2,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "IN-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "IN-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "MA-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "MA-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "MA-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "PL-01": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "PL-02": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      },
+      "PL-03": {
+        "n_runs": 3,
+        "intent_consistente": true,
+        "tools_consistentes": true,
+        "respuesta_consistente": true
+      }
+    }
+  },
+  "latencia": {
+    "n": 80,
+    "min_ms": 1040.2,
+    "media_ms": 3585.2,
+    "mediana_ms": 3022.7,
+    "p95_ms": 7961.1,
+    "max_ms": 11383.4
+  },
+  "filtrado_perfil": {
+    "n_runs": 3,
+    "respuesta_correcta_rate": 1.0,
+    "invasiones_otros_perfiles": []
+  }
+}

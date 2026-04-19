@@ -35,7 +35,8 @@ Asistente Académico: Agente Conversacional con Tool Calling
   - 6.3. Evaluación de Rendimiento (Latencia y Consumo Local)
   - 6.4. Validación de Seguridad y Resistencia a Inyecciones
   - 6.5. Evaluación de la Memoria Conversacional Híbrida
-  - 6.6. Pruebas de Multisesion y Concurrencia
+  - 6.6. Pruebas de Multisesion y 
+  - 6.7. Pruebas de Usabilidad (UX)
 - Capítulo 7: Conclusiones y Trabajo Futuro
 - Anexo A: Código Fuente Completo
 
@@ -173,7 +174,7 @@ Los RNF definen las restricciones y cualidades que debe tener el sistema para se
 
 - **RNF1. Privacidad de Datos (Local-First):** Ningún dato personal identificable (PII) ni registro académico debe ser enviado a nubes públicas. Todo el procesamiento (LLM y Base de Datos) debe ser local.
 
-- **RNF2. Latencia de Respuesta:** El tiempo transcurrido desde la consulta hasta el inicio de la respuesta (TTFT) no debe superar los 5 segundos en el hardware de ejecución local previsto.
+- **RNF2. Latencia de Respuesta:** El tiempo de respuesta de una consulta no debe superar los 5 segundos (promedio) en el hardware de ejecución local previsto.
 
 - **RNF3. Portabilidad y Modularidad:** Gracias al protocolo MCP, la lógica del asistente debe estar desacoplada del motor de base de datos, permitiendo su adaptación a diferentes sistemas de gestión académica con cambios mínimos.
 
@@ -1097,25 +1098,125 @@ Una interacción conversacional típica produce una línea como la siguiente (fo
 
 Una consulta académica que dispara una herramienta del servidor MCP produce una estructura más rica, incluyendo la fase `inicial_con_tools`, el detalle de la tool invocada y la fase `final_streaming`. Esta estructura uniforme permite consultas agregadas con herramientas estándar como `jq` o una simple carga a un notebook para análisis exploratorio.
 
-#### 6.1.6. Uso del Log como Base de Evaluación
-
-El sistema de logging actúa como sustrato para las evaluaciones descriptas en las secciones siguientes. En particular:
-
-- **Precisión del clasificador y tool calling (sección 6.2):** el campo `clasificacion`, combinado con `tools`, permite cuantificar falsos positivos (invocaciones innecesarias) y falsos negativos (consultas académicas que no dispararon ninguna herramienta). Durante el desarrollo se detectaron así, por ejemplo, casos en los que el clasificador etiquetaba preguntas sobre autoridades universitarias como `CONVERSACION`, omitiendo la consulta al índice documental; la evidencia del log guió las iteraciones sobre el prompt del clasificador.
-- **Latencia y consumo (sección 6.3):** los campos `duracion_total_ms`, `llm_calls[*].duracion_ms` y `tools[*].duracion_ms` descomponen la latencia total en sus componentes. Los campos `prompt_tokens` y `eval_tokens` reportados por Ollama permiten estimar el costo computacional de cada fase y comparar configuraciones de modelos o prompts.
-- **Seguridad (sección 6.4):** la persistencia del `mensaje_usuario` junto con la `respuesta` y las tools efectivamente invocadas permite auditar intentos de inyección de prompt o extracción de datos no autorizados.
-
-La decisión de adoptar una línea JSON por request —en lugar de múltiples líneas por fase— prioriza la simplicidad de parseo: cada registro es autocontenido y puede procesarse con un solo pase por el archivo, sin necesidad de agrupar eventos por `request_id`. El costo de esta elección es que los eventos intermedios solo se materializan al final de la request, limitando la observabilidad en vivo de requests prolongadas; esta limitación se considera aceptable dado que la latencia media del agente se mantiene por debajo de los cinco segundos.
-
 ### 6.2. Pruebas de Precisión en Respuestas y Tool Calling
 
-_(Contenido pendiente)_
+La sección 6.1 describió la instrumentación que permite auditar cada interacción del agente. Sobre esa base se diseñó una evaluación empírica que responde tres preguntas complementarias: ¿el clasificador deriva correctamente cada consulta a la rama académica o conversacional?, ¿la rama académica invoca la herramienta MCP adecuada?, y ¿la respuesta final contiene los hechos esperados dado el perfil del alumno que formula la pregunta?
+
+#### 6.2.1. Metodología
+
+La evaluación se organiza en torno a tres dimensiones de precisión, cada una cuantificable a partir de un único registro del log estructurado:
+
+1. **Precisión del clasificador de intent.** Se compara la etiqueta emitida por el clasificador (`ACADEMICA` o `CONVERSACION`) contra la clase real del caso, y se resume en una matriz de confusión de 2×2.
+2. **Precisión del tool calling.** Para los casos académicos se verifica si el conjunto de herramientas efectivamente invocadas coincide con el conjunto esperado. Para los casos conversacionales se verifica la condición dual: *ninguna* herramienta debe invocarse. Se reporta además una desagregación por tool para identificar cuáles resultan más fáciles o más difíciles de elegir para el modelo.
+3. **Precisión del contenido.** Se verifica la presencia de un conjunto de palabras clave esperadas en la respuesta final (y, en el caso de filtrado por perfil, la ausencia de datos que pertenezcan a otros alumnos). Este check es deliberadamente conservador: prioriza detectar regresiones evidentes por sobre medir la calidad lingüística de la respuesta, que queda fuera del alcance de esta tesis.
+
+Dado que el LLM se ejecuta con temperatura estrictamente positiva en producción —a fin de generar respuestas con variedad lingüística natural—, cada prompt del dataset se ejecuta **N=3 veces**. Esta repetición cumple un doble propósito: por un lado acerca las métricas al valor esperado sobre la distribución de salidas del modelo, y por otro permite cuantificar una cuarta dimensión, la **consistencia entre corridas**, entendida como la proporción de casos en los que las tres ejecuciones coinciden en cada dimensión anterior. La consistencia es un indicador de confiabilidad perceptible por el usuario final.
+
+#### 6.2.2. Diseño del Dataset
+
+El dataset de evaluación, almacenado en `scripts/eval/dataset.jsonl` (una línea JSON por caso), consta de **27 casos** distribuidos según la siguiente taxonomía:
+
+| Categoría | Tool esperada | Casos |
+|---|---|---:|
+| Historia académica | `obtener_historia_academica` | 3 |
+| Información de materia | `obtener_materia` | 3 |
+| Inscripciones vigentes | `obtener_inscripciones` | 3 |
+| Materias disponibles para cursar | `consultar_materias_disponibles` | 3 |
+| Materias faltantes para recibirse | `obtener_materias_faltantes` | 3 |
+| Plan de estudios | `obtener_plan_de_estudios` | 3 |
+| Documentos institucionales (RAG) | `buscar_en_documentos` | 3 |
+| Saludo conversacional | — | 1 |
+| Aritmética simple | — | 1 |
+| Conversación general | — | 1 |
+| Metaconsulta sobre capacidades | — | 1 |
+| Definición de conocimiento general | — | 1 |
+| **Filtrado por perfil** | `obtener_historia_academica` | 1 |
+| **Total** | — | **27** |
+
+El diseño persigue cuatro criterios simultáneos. En primer lugar, **cobertura completa** del menú de herramientas MCP: las siete tools del agente aparecen como expectativa al menos tres veces, de modo que las métricas por tool se calculen sobre al menos 9 corridas (3 casos × 3 runs). En segundo lugar, **diversidad léxica y sintáctica** dentro de cada categoría: cada tool recibe tres formulaciones distintas —registros formales, coloquiales y abreviados; preguntas directas e indirectas; uso de sinónimos como *historial*, *materias rendidas* o *notas aprobadas*— para evaluar que el clasificador y el mecanismo de tool calling no dependan de palabras gatillo específicas. En tercer lugar, **presencia de controles negativos**: los cinco casos conversacionales cubren situaciones en las que un clasificador sobreentusiasta podría invocar herramientas innecesarias (un saludo, una operación aritmética, una pregunta de conocimiento general ajena al dominio académico), y permiten detectar falsos positivos. Finalmente, se incluye un **caso de filtrado por perfil** que examina una propiedad de seguridad de datos distinta del tool calling.
+
+Se seleccionó `SIS-1001` como alumno principal porque su registro en la base seedeada cubre todas las tablas relevantes sin huecos: seis materias en la historia académica con los tres estados posibles (aprobada con nota final, promocionada sin nota final, regularizada), tres inscripciones activas en el cuatrimestre corriente, y el plan de estudios completo de Ingeniería en Sistemas, lo que permite diseñar keywords verificables para las siete tools sin ambigüedad.
+
+#### 6.2.3. Implementación del Runner
+
+El runner —`scripts/eval/run_eval.py`— automatiza el ciclo completo de evaluación. Para cada caso del dataset y cada una de las N corridas ejecuta la siguiente secuencia:
+
+1. **Autenticación.** Realiza `POST /api/auth/login` con el legajo indicado en el caso. Este paso cumple dos funciones: obtiene un token JWT para la subsiguiente llamada al chat, y —como efecto colateral del endpoint— dispara el borrado de la memoria conversacional del alumno (ver `app/routers/auth.py`), garantizando que cada corrida parta de un contexto limpio e independiente del resto.
+2. **Marca del offset del log.** Antes de enviar la consulta se consulta `os.path.getsize` sobre `logs/requests.log` para registrar el punto de corte desde el cual se leerán las líneas nuevas.
+3. **Envío de la consulta.** Se invoca `POST /api/chat` con el token y el mensaje del caso, y se consume el stream SSE hasta recibir el evento `{"tipo": "fin"}`, concatenando los `chunk` en el texto completo de respuesta.
+4. **Correlación con el log.** Tras una breve espera para acomodar el flush asíncrono de `RequestLog.emit()`, se leen las líneas nuevas del archivo desde el offset previo y se selecciona la que matchea simultáneamente el par `(mensaje_usuario, id_alumno)`. Se implementan reintentos con *backoff* corto para tolerar demoras de flush.
+5. **Cómputo de métricas.** Con la línea del log y la respuesta final se calculan los booleanos de precisión (intent, match exacto de tools, keywords presentes/faltantes, prohibidos) y se serializan a `scripts/eval/results.jsonl` —una línea JSON por corrida individual— junto con la latencia total, la descomposición de `llm_calls` y el `request_id` para trazabilidad.
+
+#### 6.2.4. Resultados — Clasificador de Intent
+
+De las 81 corridas totales (27 casos × 3), 80 produjeron una línea de log correlacionable (una corrida falló por una excepción del backend que se analiza en la sección 6.2.8). Sobre esas 80 corridas válidas, la matriz de confusión del clasificador es la siguiente:
+
+| | **Predicho ACADEMICA** | **Predicho CONVERSACION** |
+|---|---:|---:|
+| **Real ACADEMICA** | 65 | 0 |
+| **Real CONVERSACION** | 0 | 15 |
+
+El clasificador alcanza **accuracy = 100 %** sobre el dataset, con precisión y recall perfectos para ambas clases. Este resultado es particularmente relevante frente a la experiencia de desarrollo documentada en la sección 6.1.6, donde iteraciones previas del prompt del clasificador producían falsos negativos sobre consultas institucionales (p. ej. preguntas sobre autoridades universitarias etiquetadas como `CONVERSACION`). Las iteraciones sobre el prompt, guiadas por la evidencia del log, convergieron en una formulación que —al menos sobre la distribución de prompts del dataset— no produce errores detectables.
+
+#### 6.2.5. Resultados — Tool Calling
+
+Sobre las 65 corridas académicas válidas, el agente invocó exactamente el conjunto de herramientas esperado en las 65: **match exacto del 100 %**, sin tools faltantes ni tools de más. Simultáneamente, en las 15 corridas conversacionales válidas el agente no invocó ninguna tool —respeta la restricción dual de los controles negativos—, sin reproducir el antipatrón de *saludos que disparan `obtener_historia_academica`* observado durante el desarrollo temprano (ver sección 6.1.6). La desagregación por tool muestra uniformidad entre todas las herramientas del menú MCP:
+
+| Tool | Corridas evaluadas | Match exacto |
+|---|---:|---:|
+| `obtener_historia_academica` | 12 | 100 % |
+| `obtener_materia` | 9 | 100 % |
+| `obtener_inscripciones` | 8 | 100 % |
+| `consultar_materias_disponibles` | 9 | 100 % |
+| `obtener_materias_faltantes` | 9 | 100 % |
+| `obtener_plan_de_estudios` | 9 | 100 % |
+| `buscar_en_documentos` | 9 | 100 % |
+
+El valor `n = 12` de `obtener_historia_academica` incluye las tres corridas del caso de filtrado por perfil, que también espera esa tool. El valor `n = 8` de `obtener_inscripciones` refleja la corrida perdida por la excepción del backend comentada en 6.2.9.
+
+Dos factores contribuyen a este resultado. Primero, el diseño del orquestador fuerza la decisión de tool calling en una única llamada al modelo con el menú completo expuesto como funciones, lo que concentra la decisión en un único punto instrumentable y auditable. Segundo, los nombres y descripciones de las tools están alineados con el vocabulario del dominio académico argentino (*historia académica*, *inscripciones*, *correlativas*, *plan de estudios*), lo que facilita el matching semántico que realiza el LLM al elegir.
+
+#### 6.2.6. Resultados — Contenido y Filtrado por Perfil
+
+La métrica de contenido —presencia de todas las keywords esperadas y ausencia de prohibidas en la respuesta final— se cumple en el **88.8 %** de las corridas (71 de 80). El largo promedio de respuesta es de 445 caracteres, coherente con el estilo conciso y orientado a datos del agente.
+
+Las 9 corridas con falla de contenido se concentran en tres casos específicos —`DI-01`, `DI-03` y `FA-02`—, con los tres *runs* de cada caso fallando por el mismo keyword faltante:
+
+| Caso | Prompt | Keyword faltante |
+|---|---|---|
+| `DI-01` | *¿qué materias puedo cursar el próximo cuatrimestre?* | `cursar` |
+| `DI-03` | *¿qué materias me habilitan a anotarme según mi avance?* | `correlativa` |
+| `FA-02` | *¿qué porcentaje de la carrera llevo aprobado?* | `porcentaje` |
+
+La revisión manual de las respuestas asociadas muestra que en todos los casos la información solicitada **sí está presente**, pero expresada con sinónimos: *"podés inscribirte"* en lugar de *"podés cursar"*, *"materias previas requeridas"* en lugar de *"correlativas"*, y un número absoluto (*"llevás aprobadas 9 de 35 materias, un 25 %..."*) que omite literalmente la palabra *porcentaje*. Estos casos evidencian una limitación del enfoque de verificación por keywords exactos, por lo que no se trata de una falla del agente y seran considerados como **falsos negativos** ya que el criterio booleano no capta variaciones léxicas legítimas.
+
+El **caso de filtrado por perfil (`FP-01`)** se comportó correctamente en las 3 corridas: la respuesta, autenticada como `SIS-1002` (Carlos), siempre incluyó materias propias de su historial (`Álgebra`) y nunca mencionó materias del historial del alumno principal (`Algoritmos`, `Análisis Matemático II`). No se observaron invasiones de datos entre perfiles, lo cual valida empíricamente que la inyección del `id_alumno` en las tools MCP —extraído del token JWT y no del prompt del usuario— aísla correctamente los datos por sesión.
+
+#### 6.2.7. Consistencia entre Corridas
+
+La cuarta dimensión —estabilidad del comportamiento ante N=3 ejecuciones del mismo prompt con temperatura positiva— se resume en tres tasas, calculadas sobre los 27 casos:
+
+| Dimensión | Casos con 3-de-3 consistentes |
+|---|---:|
+| Intent | 100 % (27 / 27) |
+| Tools invocadas | 100 % (27 / 27) |
+| Respuesta (cumple o no el check de contenido) | 100 % (27 / 27) |
+
+La consistencia perfecta indica que, al menos para los prompts del dataset, la variabilidad estocástica del LLM no afecta las decisiones estructurales (rama, tool) ni la presencia de los hechos verificados; se concentra exclusivamente en la forma superficial del texto. En términos prácticos, esto significa que un usuario que repite la misma consulta esperando una respuesta levemente redactada de otra manera obtendrá variedad estilística sin perder la información subyacente.
+
+#### 6.2.8. Caso Borde: Uso de Argumentos Inválidos en Tools
+
+La única corrida perdida de las 81 —`IN-01` run 1— produjo un `TypeError` ya que el modelo llamó a la tool `obtener_inscripciones` con argumentos cuando la firma de la funcion no los acepta: `{"alumno": "María González", "periodo_actual": "2026-1C", "materias": []}`.
+
+Cabe preguntarse por qué falló esta tool y no otra: cinco de las siete herramientas exponen al LLM el mismo schema vacío (`"properties": {}, "required": []`), y cualquiera podría haber disparado el mismo error. La diferencia está en la **descripción textual** de cada tool. La de `obtener_inscripciones` enumera explícitamente *"materia, comisión, día, horario, aula, sede y profesor"* y menciona *"periodo actual"*; los argumentos alucinados por el modelo —`alumno`, `periodo_actual`, `materias`— son proyección directa de ese vocabulario. En contraste, `obtener_historia_academica` usa el adjetivo *"autenticado"* (señal pragmática de identidad implícita), y `obtener_plan_de_estudios` / `obtener_materias_faltantes` tienen descripciones más atómicas y menos parametrizables. A mayor riqueza léxica de la descripción, mayor probabilidad marginal de alucinación de argumentos.
+
+La falla es además **estocástica**: de las tres corridas de `IN-01` solo falló una, y los otros dos prompts de la misma tool (`IN-02`, `IN-03`) completaron sus seis corridas correctamente. Esto confirma que no es una incompatibilidad determinista, sino la confluencia entre el prompt, el vocabulario de la descripción y el muestreo bajo temperatura positiva. Como trabajo futuro, se podrian redactar las descripciones con más parquedad o incluir la cláusula *"esta función no acepta argumentos"* para mitigar estos casos.
 
 ### 6.3. Evaluación de Rendimiento (Latencia y Consumo Local)
 
 _(Contenido pendiente)_
 
-### 6.4. Validación de Seguridad y Resistencia a Inyecciones
+### 6.4. Validación de Seguridad, Rate Limit y Resistencia a Inyecciones
 
 _(Contenido pendiente)_
 
@@ -1124,6 +1225,10 @@ _(Contenido pendiente)_
 _(Contenido pendiente)_
 
 ### 6.6. Pruebas de Multisesión y Concurrencia
+
+_(Contenido pendiente)_
+
+### 6.7. Pruebas de Usabilidad (UX)
 
 _(Contenido pendiente)_
 

@@ -1,6 +1,6 @@
 import time
 
-MAX_REQUESTS = 10
+MAX_REQUESTS = 120
 WINDOW_SECONDS = 60
 
 _requests: dict[int, list[float]] = {}
