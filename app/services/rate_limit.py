@@ -1,7 +1,10 @@
+import os
 import time
 
-MAX_REQUESTS = 120
-WINDOW_SECONDS = 60
+# Valores de producción por defecto. Pueden sobrescribirse con las variables
+# de entorno RATE_LIMIT_MAX / RATE_LIMIT_WINDOW_SECONDS (útil para pruebas).
+MAX_REQUESTS = int(os.getenv("RATE_LIMIT_MAX", "30"))
+WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 
 _requests: dict[int, list[float]] = {}
 
