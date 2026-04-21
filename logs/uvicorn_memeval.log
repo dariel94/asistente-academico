@@ -1,0 +1,436 @@
+INFO:     Started server process [10436]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56309 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56326 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56326 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:19:45,811 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:19:46,671 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:19:47,104 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:19:48,579 INFO asistente.request {"request_id": "b29ceb28-696e-4e06-bb98-45f56a9e1c6a", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 8988.2, "mensaje_usuario": "¿qué información tenés sobre la materia Álgebra?", "tools": [{"nombre": "obtener_materia", "args": {"nombre_materia": "Álgebra"}, "duracion_ms": 13.3, "ok": true, "resultado_chars": 400, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 6219.6, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 859.5, "prompt_tokens": 1084, "eval_tokens": 23}, {"fase": "final_streaming", "duracion_ms": 1874.9, "prompt_tokens": 521, "eval_tokens": 111}], "respuesta": "La materia es Álgebra y Geometría Analítica. Está en el primer cuatrimestre del año lectivo 2026-1C. Tiene una carga horaria de 6 horas semanalmente y no requiere ninguna correlativa previa. La comisión para este cuatrimestre es C1, que se dictará en la aula 102 del Campus Centro con el profesor Ing. Ruiz. El horario es martes y jueves de 10:00 a 12:00.", "respuesta_chars": 355, "error": null}
+INFO:     127.0.0.1:56494 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56494 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:11,911 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:12,775 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:13,175 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:14,493 INFO asistente.request {"request_id": "82660636-0f06-4638-b4e9-5513e436ff46", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3351.3, "mensaje_usuario": "¿qué información tenés sobre la materia Álgebra?", "tools": [{"nombre": "obtener_materia", "args": {"nombre_materia": "Álgebra"}, "duracion_ms": 2.4, "ok": true, "resultado_chars": 400, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 769.0, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 864.6, "prompt_tokens": 1084, "eval_tokens": 23}, {"fase": "final_streaming", "duracion_ms": 1712.8, "prompt_tokens": 521, "eval_tokens": 101}], "respuesta": "La materia de Álgebra es Álgebra y Geometría Analítica, que se imparte en el primer cuatrimestre del primer año. La carga horaria es de 6 horas semanalmente. No hay correlativas para esta materia. Hay una comisión con el nombre de C1 en el periodo académico 2026-1C, que se dicta en el aula 102 del campus Centro y está a cargo del profesor Ing. Ruiz.", "respuesta_chars": 351, "error": null}
+INFO:     127.0.0.1:56515 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:17,024 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:17,825 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:18,272 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:19,280 INFO asistente.request {"request_id": "52011706-9ad5-4855-8387-6736339688bd", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2952.5, "mensaje_usuario": "¿en qué sede la curso?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 3.8, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 695.9, "prompt_tokens": 311, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 800.4, "prompt_tokens": 1201, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 1449.1, "prompt_tokens": 792, "eval_tokens": 77}], "respuesta": "La materia de Álgebra y Geometría Analítica se dicta en la sede Campus Centro, en el aula 102 del campus mencionado anteriormente. La clase es el martes entre las 10:00 horas y las 12:00 horas y también el miércoles entre las 18:00 horas y las 20:00 horas.", "respuesta_chars": 256, "error": null}
+INFO:     127.0.0.1:56535 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:21,768 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:22,258 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:22,822 INFO asistente.request {"request_id": "ebca227e-a80f-4e1d-90fc-392b67e4a299", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1730.3, "mensaje_usuario": "¿y el profesor quién es?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 677.6, "prompt_tokens": 313, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1050.3, "prompt_tokens": 537, "eval_tokens": 39}], "respuesta": "La materia de Álgebra y Geometría Analítica está a cargo del profesor Ing. Juan Carlos Ruiz, que tiene su oficina en el edificio A del Campus Centro.", "respuesta_chars": 149, "error": null}
+INFO:     127.0.0.1:53292 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:25,273 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:26,109 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:26,596 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:27,487 INFO asistente.request {"request_id": "dde00ef0-9370-4c8d-8753-65dc4a4229e3", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2854.0, "mensaje_usuario": "¿y qué días y a qué hora tengo la cursada?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.2, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 640.9, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 835.4, "prompt_tokens": 1357, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 1373.9, "prompt_tokens": 948, "eval_tokens": 67}], "respuesta": "La cursada de la materia Álgebra y Geometría Analítica se dicta los martes entre las 10:00 horas y las 12:00 horas en el aula 102 del Campus Centro, y también los miércoles entre las 18:00 horas y las 20:00 horas.", "respuesta_chars": 213, "error": null}
+INFO:     127.0.0.1:52264 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52264 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:30,208 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:31,124 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:31,125 INFO asistente.request {"request_id": "0a138ae5-8906-4c7b-bcfb-8bd1bd1eb95c", "id_alumno": 2, "estado": "error", "clasificacion": "ACADEMICA", "duracion_total_ms": 1612.0, "mensaje_usuario": "Para que tengas contexto de mí: este año me puse como objetivo aprobar Álgebra sí o sí, porque la recursé y necesito terminarla antes de avanzar.", "tools": [{"nombre": "obtener_historia_academica", "args": {"Legajo": "SIS-1002"}, "duracion_ms": 0.0, "ok": false, "resultado_chars": 46, "error": "TypeError: obtener_historia_academica() got an unexpected keyword argument 'Legajo'"}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 694.5, "prompt_tokens": 343, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 916.6, "prompt_tokens": 1111, "eval_tokens": 28}], "respuesta": "", "respuesta_chars": 0, "error": "TypeError: obtener_historia_academica() got an unexpected keyword argument 'Legajo'"}
+INFO:     127.0.0.1:52264 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:33,583 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:34,024 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:34,199 INFO asistente.request {"request_id": "725ae0b0-7862-40cb-b502-2eaf3623ec22", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1264.1, "mensaje_usuario": "¿qué día de la semana es hoy?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 647.6, "prompt_tokens": 313, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 613.5, "prompt_tokens": 322, "eval_tokens": 13}], "respuesta": "Hoy martes 21/04/2026.", "respuesta_chars": 22, "error": null}
+INFO:     127.0.0.1:52291 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:36,627 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:37,057 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:37,904 INFO asistente.request {"request_id": "91397cdb-933a-4add-92e0-f6effd591165", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1892.8, "mensaje_usuario": "contame un poco qué tipo de asistente sos y en qué me podés ayudar", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 615.5, "prompt_tokens": 324, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1274.4, "prompt_tokens": 363, "eval_tokens": 62}], "respuesta": "Sos Carlos, un alumno de Ingeniería en Sistemas de Información. Como tu asistente académico virtual, te puedo ayudar con consultas sobre tus módulos, materias, horarios, calificaciones y cualquier otra información relacionada a tu vida universitaria.", "respuesta_chars": 250, "error": null}
+INFO:     127.0.0.1:52306 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:40,408 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:40,834 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:41,008 INFO asistente.request {"request_id": "210b9bec-9f62-417c-ba10-0aa133fd3400", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1275.4, "mensaje_usuario": "cuánto es 120 mas 85", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 675.4, "prompt_tokens": 314, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 597.1, "prompt_tokens": 443, "eval_tokens": 14}], "respuesta": "Sencillo! 120 + 85 = 205.", "respuesta_chars": 25, "error": null}
+INFO:     127.0.0.1:52319 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:43,444 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:44,263 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:44,727 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:45,869 INFO asistente.request {"request_id": "444f868d-3eae-415c-a40c-ed168963a053", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3049.1, "mensaje_usuario": "dame mis inscripciones de este cuatrimestre", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.3, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 624.4, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 819.1, "prompt_tokens": 1236, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 1601.2, "prompt_tokens": 828, "eval_tokens": 87}], "respuesta": "Tienes dos materias inscritas para este cuatrimestre:\n\n- Álgebra y Geometría Analítica (Comisión C1, lunes 10:00 - 12:00 en Aula 102, Campus Centro)\n- Análisis Matemático I (Comisión C2, miércoles 18:00 - 20:00 en Aula 105, Campus Norte)", "respuesta_chars": 237, "error": null}
+INFO:     127.0.0.1:52343 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:48,356 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:49,222 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:49,704 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:51,066 INFO asistente.request {"request_id": "3335e470-6fa2-4948-b9c5-a943da86675a", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3384.9, "mensaje_usuario": "¿qué notas tengo en mi historial académico?", "tools": [{"nombre": "obtener_historia_academica", "args": {}, "duracion_ms": 4.5, "ok": true, "resultado_chars": 557, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 674.0, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 866.4, "prompt_tokens": 1345, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 1837.3, "prompt_tokens": 815, "eval_tokens": 104}], "respuesta": "Tienes las siguientes notas en tu historial académico:\n\n- En Álgebra y Geometría Analítica (desaprobada) tienes una nota cursada de 3.00.\n- En Análisis Matemático I (regularizada) tienes una nota cursada de 5.00.\n- En Sistemas y Organizaciones (promocionada) tienes una nota cursada de 9.00.\n\nNo encontré notas para el cuatrimestre en curso.", "respuesta_chars": 341, "error": null}
+INFO:     127.0.0.1:52366 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:53,570 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:54,462 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:54,995 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:56,206 INFO asistente.request {"request_id": "8cf0dce8-40a1-4683-945c-6b01dd2492cb", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3330.6, "mensaje_usuario": "¿cuántas materias me faltan para recibirme?", "tools": [{"nombre": "obtener_materias_faltantes", "args": {}, "duracion_ms": 3.3, "ok": true, "resultado_chars": 1018, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 695.0, "prompt_tokens": 318, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 891.1, "prompt_tokens": 1472, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 1738.6, "prompt_tokens": 1151, "eval_tokens": 92}], "respuesta": "Para obtener la cantidad de materias que te faltan para recibirte, necesito saber cuántas materias son las mínimas requeridas para completar tu plan de estudios. Según el sistema, tienes un total de 11 materias en tu plan de estudio y has aprobado 1 de ellas.\n\nPor lo tanto, te faltan 10 materias para completar tu plan de estudios y recibirte.", "respuesta_chars": 344, "error": null}
+INFO:     127.0.0.1:52386 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:58,640 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:20:59,529 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:00,060 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:01,160 INFO asistente.request {"request_id": "9c3ca007-18df-4b1a-9d07-f86f239dbb0e", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3130.0, "mensaje_usuario": "mostrame el plan de estudios completo de mi carrera", "tools": [{"nombre": "obtener_plan_de_estudios", "args": {}, "duracion_ms": 2.2, "ok": true, "resultado_chars": 1107, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 610.0, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 888.8, "prompt_tokens": 1553, "eval_tokens": 17}, {"fase": "final_streaming", "duracion_ms": 1625.9, "prompt_tokens": 1258, "eval_tokens": 83}], "respuesta": "Con el plan de estudios completo de tu carrera a la vista, podemos calcular que te faltan 10 materias para completar tu plan de estudio y recibirte. Te sobraron algunas materias que ya has aprobado anteriormente. Recuerda revisar los requisitos específicos para tu grado académico para asegurarte de que estás en el camino correcto.", "respuesta_chars": 332, "error": null}
+INFO:     127.0.0.1:52405 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:03,631 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:04,538 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:05,027 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:05,838 INFO asistente.request {"request_id": "e8de7bb5-63fd-4eee-872c-e0c73b8786d3", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2854.6, "mensaje_usuario": "¿qué materias podría cursar el cuatrimestre que viene?", "tools": [{"nombre": "consultar_materias_disponibles", "args": {}, "duracion_ms": 4.2, "ok": true, "resultado_chars": 219, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 647.0, "prompt_tokens": 319, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 907.1, "prompt_tokens": 1571, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 1292.7, "prompt_tokens": 929, "eval_tokens": 62}], "respuesta": "Según el sistema, podrías considerar cursar la materia \"Algoritmos y Estructuras de Datos\" o \"Física I\" para el cuatrimestre que viene. Recuerda consultar con tu asesor académico antes de tomar cualquier decisión sobre tus cursos.", "respuesta_chars": 230, "error": null}
+INFO:     127.0.0.1:52424 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:08,288 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:08,881 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:09,553 INFO asistente.request {"request_id": "7df6909e-7994-4faa-8271-4286d3c76aa3", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1902.3, "mensaje_usuario": "buenísimo. una última curiosidad: ¿cómo te llamás?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 637.5, "prompt_tokens": 322, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1261.3, "prompt_tokens": 869, "eval_tokens": 48}], "respuesta": "Me llamo Selene, soy tu asistente académica virtual. Estoy aquí para ayudarte con cualquier consulta o duda que tengas sobre tu plan de estudios y tus materias. ¡Hasta luego!", "respuesta_chars": 174, "error": null}
+INFO:     127.0.0.1:52440 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:12,008 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:12,538 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:13,231 INFO asistente.request {"request_id": "e1bfd5de-ad18-4487-8b7e-e70618a6f68a", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1867.1, "mensaje_usuario": "perfecto. ¿tenés un chiste corto para distenderme un rato?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 643.3, "prompt_tokens": 323, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1220.2, "prompt_tokens": 837, "eval_tokens": 53}], "respuesta": "¡Claro! Un estudiante se pregunta a su profesor: \"¿Qué le pasa al 0.0001 en la ecuación?\" El profesor responde: \"Que desaparece, como tus notas si no estudias\".", "respuesta_chars": 160, "error": null}
+INFO:     127.0.0.1:52454 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:15,699 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:16,265 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:21,811 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:21:21,848 INFO asistente.request {"request_id": "388f188d-e52b-47c1-adc3-4830989072fc", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 6784.9, "mensaje_usuario": "ahora sí, volvamos al principio: ¿te acordás cuál era la materia que te dije al inicio que yo quería priorizar este año?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 634.7, "prompt_tokens": 339, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1088.0, "prompt_tokens": 809, "eval_tokens": 36}], "respuesta": "No encontré ninguna referencia a una materia específica que mencionaras al comienzo de nuestra conversación. Podrías recordarme qué era lo que comentaste?", "respuesta_chars": 154, "error": null}
+INFO:     127.0.0.1:60558 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60558 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:29,791 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:30,670 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:31,081 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:32,502 INFO asistente.request {"request_id": "90daac48-f8ed-41b5-b579-704613057e25", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3457.8, "mensaje_usuario": "¿qué información tenés sobre la materia Álgebra?", "tools": [{"nombre": "obtener_materia", "args": {"nombre_materia": "Álgebra"}, "duracion_ms": 3.0, "ok": true, "resultado_chars": 400, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 744.9, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 880.2, "prompt_tokens": 1084, "eval_tokens": 23}, {"fase": "final_streaming", "duracion_ms": 1825.3, "prompt_tokens": 521, "eval_tokens": 108}], "respuesta": "La materia Álgebra y Geometría Analítica es una asignatura del primer cuatrimestre del año académico 2026-1C. Tiene una carga horaria de 6 horas semanalmente y se imparte en el Campus Centro, específicamente en la aula A102. El profesor encargado es Ing. Ruiz y los horarios de clase son martes de 10:00 a 12:00 y viernes de 10:00 a 12:00.", "respuesta_chars": 339, "error": null}
+INFO:     127.0.0.1:60581 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:34,932 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:35,713 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:36,166 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:36,434 INFO asistente.request {"request_id": "6443c436-bb88-4b12-ba10-f4310710395b", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2115.7, "mensaje_usuario": "¿en qué sede la curso?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.5, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 613.2, "prompt_tokens": 311, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 781.5, "prompt_tokens": 1208, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 716.0, "prompt_tokens": 799, "eval_tokens": 21}], "respuesta": "La materia Álgebra y Geometría Analítica se imparte en la sede Campus Centro.", "respuesta_chars": 77, "error": null}
+INFO:     127.0.0.1:60598 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:38,915 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:39,381 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:39,872 INFO asistente.request {"request_id": "fe337d70-d298-4673-b5a7-67e5f27a5ec6", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1626.6, "mensaje_usuario": "¿y el profesor quién es?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 670.1, "prompt_tokens": 313, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 953.5, "prompt_tokens": 488, "eval_tokens": 38}], "respuesta": "No encontré información sobre el profesor asignado para la materia Álgebra y Geometría Analítica. Es posible que no esté disponible o actualizada en este momento.", "respuesta_chars": 162, "error": null}
+INFO:     127.0.0.1:60611 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:42,324 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:43,147 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:43,614 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:44,384 INFO asistente.request {"request_id": "cc489c68-efe1-4966-977a-cc1734a149e0", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2701.0, "mensaje_usuario": "¿y qué días y a qué hora tengo la cursada?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.0, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 640.4, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 823.3, "prompt_tokens": 1307, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 1233.2, "prompt_tokens": 898, "eval_tokens": 59}], "respuesta": "Según la información disponible, tienes cursada de Álgebra y Geometría Analítica el martes de 10:00 a 12:00 en la sede Campus Centro, y el viernes de 18:00 a 20:00 también en la misma sede.", "respuesta_chars": 189, "error": null}
+INFO:     127.0.0.1:60631 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60631 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:47,124 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:48,025 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:48,026 INFO asistente.request {"request_id": "993c68c8-c944-4494-82a3-1e14a1e69440", "id_alumno": 2, "estado": "error", "clasificacion": "ACADEMICA", "duracion_total_ms": 1605.1, "mensaje_usuario": "Para que tengas contexto de mí: este año me puse como objetivo aprobar Álgebra sí o sí, porque la recursé y necesito terminarla antes de avanzar.", "tools": [{"nombre": "obtener_inscripciones", "args": {"sede": "SIS-1002"}, "duracion_ms": 0.0, "ok": false, "resultado_chars": 41, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'sede'"}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 701.9, "prompt_tokens": 343, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 901.9, "prompt_tokens": 1111, "eval_tokens": 25}], "respuesta": "", "respuesta_chars": 0, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'sede'"}
+INFO:     127.0.0.1:60631 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:50,503 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:50,922 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:51,004 INFO asistente.request {"request_id": "27acac61-1d3b-4da8-9241-6deb1c939730", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1167.5, "mensaje_usuario": "¿qué día de la semana es hoy?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 666.5, "prompt_tokens": 313, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 498.5, "prompt_tokens": 322, "eval_tokens": 7}], "respuesta": "Hoy es martes.", "respuesta_chars": 14, "error": null}
+INFO:     127.0.0.1:60663 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:53,464 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:53,910 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:55,359 INFO asistente.request {"request_id": "f83d05ff-c2e7-43df-8650-9ce08584cbe9", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 2542.5, "mensaje_usuario": "contame un poco qué tipo de asistente sos y en qué me podés ayudar", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 647.0, "prompt_tokens": 324, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1892.4, "prompt_tokens": 357, "eval_tokens": 111}], "respuesta": "Soy Selene, una asistente académica virtual. Mi trabajo es ayudarte con cualquier consulta o duda que tengas relacionada con tu carrera como Ingeniero en Sistemas de Información. Puedo ayudarte a encontrar información sobre tus asignaturas, horarios, calendario académico y mucho más. Estoy aquí para apoyarte en todo lo que necesites para que puedas seguir adelante con tu trayectoria universitaria. ¿Hay algo específico en lo que pueda ayudarte hoy?", "respuesta_chars": 451, "error": null}
+INFO:     127.0.0.1:60679 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:57,822 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:58,267 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:25:58,428 INFO asistente.request {"request_id": "46e4fc70-e606-474a-ac40-bda8ff66f453", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1257.1, "mensaje_usuario": "cuánto es 120 mas 85", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 651.3, "prompt_tokens": 314, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 602.5, "prompt_tokens": 486, "eval_tokens": 13}], "respuesta": "La suma de 120 y 85 es 205.", "respuesta_chars": 27, "error": null}
+INFO:     127.0.0.1:60692 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:00,909 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:01,729 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:02,201 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:03,870 INFO asistente.request {"request_id": "eae3c44b-df37-4cae-8974-e40fa8da0b99", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3630.2, "mensaje_usuario": "dame mis inscripciones de este cuatrimestre", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.0, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 669.0, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 819.3, "prompt_tokens": 1278, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 2138.2, "prompt_tokens": 870, "eval_tokens": 127}], "respuesta": "Carlos, parece que tienes dos materias inscritas en este cuatrimestre:\n\n* Álgebra y Geometría Analítica (comisión C1) el martes de 10 a 12 en la aula 102 del Campus Centro.\n* Análisis Matemático I (comisión C2) el martes de 18 a 20 en la aula 105 del Campus Norte.\n\nY también tienes clase los jueves de 10 a 12 para Álgebra y Geometría Analítica, y de 18 a 20 para Análisis Matemático I.", "respuesta_chars": 387, "error": null}
+INFO:     127.0.0.1:60713 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:06,329 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:07,203 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:07,681 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:09,643 INFO asistente.request {"request_id": "2917986a-9c9e-4775-8aee-9adfceafb951", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3937.1, "mensaje_usuario": "¿qué notas tengo en mi historial académico?", "tools": [{"nombre": "obtener_historia_academica", "args": {}, "duracion_ms": 1.9, "ok": true, "resultado_chars": 557, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 623.0, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 873.7, "prompt_tokens": 1427, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 2435.7, "prompt_tokens": 897, "eval_tokens": 149}], "respuesta": "Carlos, según tu historial académico, tienes las siguientes materias:\n\n* Álgebra y Geometría Analítica (2024-1C): desaprobada con nota 3.00\n* Análisis Matemático I (2024-1C): regularizada con nota 5.00\n* Sistemas y Organizaciones (2024-1C): promocionada con nota 9.00\n\nTodavía no has recibido nota final para Álgebra y Geometría Analítica ni Análisis Matemático I, pero en el caso de Sistemas y Organizaciones ya se te ha asignado la calificación de promocionada.", "respuesta_chars": 463, "error": null}
+INFO:     127.0.0.1:60736 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:12,117 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:13,039 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:13,597 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:15,867 INFO asistente.request {"request_id": "ddde7a86-4915-4870-8ec1-296da6ce4f87", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 4411.7, "mensaje_usuario": "¿cuántas materias me faltan para recibirme?", "tools": [{"nombre": "obtener_materias_faltantes", "args": {}, "duracion_ms": 1.9, "ok": true, "resultado_chars": 1018, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 660.7, "prompt_tokens": 318, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 921.1, "prompt_tokens": 1599, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 2817.9, "prompt_tokens": 1278, "eval_tokens": 169}], "respuesta": "Carlos, según el plan de estudio de tu carrera como Ingeniero en Sistemas de Información, te faltan 10 materias para recibirte. Estas son:\n\n* Álgebra y Geometría Analítica (falta la nota final)\n* Análisis Matemático II\n* Física I\n* Física II\n* Paradigmas de Programación\n* Sintaxis y Semántica de Lenguajes\n* Bases de Datos\n* Diseño de Sistemas\n* Estructuras de Datos\n* Programación en Lenguajes Imperativos\n\nEspero que esta información te sea útil. Recuerda consultar con tus profesores o asesor académico para obtener más detalles sobre cada materia y planificar tu curso de acción adecuadamente.", "respuesta_chars": 598, "error": null}
+INFO:     127.0.0.1:60413 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:18,318 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:19,218 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:19,813 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:20,247 INFO asistente.request {"request_id": "19b25c64-ac68-4d0d-afd6-7051c91332f3", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2557.1, "mensaje_usuario": "mostrame el plan de estudios completo de mi carrera", "tools": [{"nombre": "obtener_plan_de_estudios", "args": {}, "duracion_ms": 2.3, "ok": true, "resultado_chars": 1107, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 627.3, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 900.2, "prompt_tokens": 1763, "eval_tokens": 17}, {"fase": "final_streaming", "duracion_ms": 1023.9, "prompt_tokens": 1468, "eval_tokens": 33}], "respuesta": "Lo siento, pero no puedo proporcionar información detallada sobre el plan de estudios de la carrera. ¿En qué puedo ayudarte con eso?", "respuesta_chars": 132, "error": null}
+INFO:     127.0.0.1:60431 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:22,713 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:23,640 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:24,140 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:25,696 INFO asistente.request {"request_id": "f9680832-45c0-4d42-8e9f-b9bfd08bdfa3", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3638.0, "mensaje_usuario": "¿qué materias podría cursar el cuatrimestre que viene?", "tools": [{"nombre": "consultar_materias_disponibles", "args": {}, "duracion_ms": 3.5, "ok": true, "resultado_chars": 219, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 654.2, "prompt_tokens": 319, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 927.4, "prompt_tokens": 1682, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 2050.4, "prompt_tokens": 1040, "eval_tokens": 117}], "respuesta": "Carlos, según el plan de estudios de tu carrera como Ingeniero en Sistemas de Información, podrías considerar cursar las siguientes materias en el cuatrimestre que viene:\n\n* Algoritmos y Estructuras de Datos\n* Física I\n\nEstas materias se encuentran dentro del primer año de tu carrera y son parte del plan de estudios. Sin embargo, es importante que consultes con tus profesores o asesor académico para obtener más detalles sobre cada materia y planificar tu curso de acción adecuadamente.", "respuesta_chars": 489, "error": null}
+INFO:     127.0.0.1:60452 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:28,103 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:28,673 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:29,262 INFO asistente.request {"request_id": "a74748ab-2e66-4366-b67f-8438cd27919a", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1738.2, "mensaje_usuario": "buenísimo. una última curiosidad: ¿cómo te llamás?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 578.4, "prompt_tokens": 322, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1156.5, "prompt_tokens": 1036, "eval_tokens": 45}], "respuesta": "Carlos, me llamo Selene. Soy tu asistente académica virtual y estoy aquí para ayudarte con cualquier consulta o inquietud que tengas sobre tus estudios. ¡Hasta la próxima!", "respuesta_chars": 171, "error": null}
+INFO:     127.0.0.1:60467 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:31,701 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:32,241 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:32,826 INFO asistente.request {"request_id": "50663a21-9d02-4cf6-a8da-1a87f027d408", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1754.1, "mensaje_usuario": "perfecto. ¿tenés un chiste corto para distenderme un rato?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 628.4, "prompt_tokens": 323, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1122.6, "prompt_tokens": 961, "eval_tokens": 45}], "respuesta": "Carlos, aquí te dejo uno: \"¿Por qué el estudiante trajo una caja a clase? Porque estaba perdido en las mates!\" Espero que te haya hecho sonreír un poco.", "respuesta_chars": 152, "error": null}
+INFO:     127.0.0.1:60481 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:35,299 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:35,832 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:40,176 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:40,179 INFO asistente.request {"request_id": "f2fe1411-e42b-43f7-bbfa-0c24f359ed51", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 5524.6, "mensaje_usuario": "gracias. seguimos.", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 644.5, "prompt_tokens": 310, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 999.0, "prompt_tokens": 851, "eval_tokens": 36}], "respuesta": "De nada, Carlos. Me alegra haber podido ayudarte. ¡Que tengas un buen día y buena suerte con tus estudios! Hasta la próxima.", "respuesta_chars": 124, "error": null}
+INFO:     127.0.0.1:49208 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:42,644 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:43,784 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:44,277 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:26:44,615 INFO asistente.request {"request_id": "de9d7681-b218-4eab-8eb3-a35e266dced1", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2623.6, "mensaje_usuario": "ahora sí, volvamos al principio: ¿te acordás cuál era la materia que te dije al inicio que yo quería priorizar este año?", "tools": [{"nombre": "obtener_materia", "args": {"nombre_materia": "Álgebra y Geometría Analítica"}, "duracion_ms": 2.2, "ok": true, "resultado_chars": 400, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 652.6, "prompt_tokens": 339, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 1139.2, "prompt_tokens": 1757, "eval_tokens": 29}, {"fase": "final_streaming", "duracion_ms": 826.1, "prompt_tokens": 1200, "eval_tokens": 25}], "respuesta": "La materia que mencionaste al principio para priorizar este año es Álgebra y Geometría Analítica.", "respuesta_chars": 97, "error": null}
+INFO:     127.0.0.1:56141 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56141 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:33,954 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:34,816 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:35,225 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:36,783 INFO asistente.request {"request_id": "e7f9dc8b-5ed1-4034-93a5-84f95192a11d", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3534.5, "mensaje_usuario": "¿qué información tenés sobre la materia Álgebra?", "tools": [{"nombre": "obtener_materia", "args": {"nombre_materia": "Álgebra"}, "duracion_ms": 2.4, "ok": true, "resultado_chars": 400, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 705.2, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 861.9, "prompt_tokens": 1084, "eval_tokens": 23}, {"fase": "final_streaming", "duracion_ms": 1962.5, "prompt_tokens": 521, "eval_tokens": 119}], "respuesta": "La materia que encontré es Álgebra y Geometría Analítica. Esta materia tiene una carga horaria de 6 horas y se dicta en el cuatrimestre 1 del año plan 2026-1C. La comisión C1 se encuentra disponible en la sede Campus Centro, concretamente en el aula 102, y está a cargo del profesor Ing. Ruiz. El horario es los martes de 10:00 a 12:00 horas y los jueves de 10:00 a 12:00 horas.", "respuesta_chars": 378, "error": null}
+INFO:     127.0.0.1:56162 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:39,273 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:40,179 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:40,180 INFO asistente.request {"request_id": "f3604935-95bd-4b26-ae87-2aed2faf2c4d", "id_alumno": 2, "estado": "error", "clasificacion": "ACADEMICA", "duracion_total_ms": 1586.0, "mensaje_usuario": "¿en qué sede la curso?", "tools": [{"nombre": "obtener_inscripciones", "args": {"sede": "[\"Campus Centro\"]"}, "duracion_ms": 0.0, "ok": false, "resultado_chars": 41, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'sede'"}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 678.8, "prompt_tokens": 311, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 906.4, "prompt_tokens": 1219, "eval_tokens": 25}], "respuesta": "", "respuesta_chars": 0, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'sede'"}
+INFO:     127.0.0.1:56162 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:42,676 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:43,474 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:43,917 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:44,303 INFO asistente.request {"request_id": "1f260c6d-4bb3-4961-a773-b393028f3fa4", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2309.9, "mensaje_usuario": "¿y el profesor quién es?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 0.9, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 682.2, "prompt_tokens": 313, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 797.8, "prompt_tokens": 1221, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 825.2, "prompt_tokens": 812, "eval_tokens": 30}], "respuesta": "El profesor que dicta la materia Álgebra y Geometría Analítica es Ing. Ruiz, en la comisión C1.", "respuesta_chars": 95, "error": null}
+INFO:     127.0.0.1:56196 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:46,830 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:47,640 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:48,121 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:27:49,023 INFO asistente.request {"request_id": "4b54da66-1785-47df-afbe-f54a99f092c0", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2897.0, "mensaje_usuario": "¿y qué días y a qué hora tengo la cursada?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.0, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 703.7, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 810.1, "prompt_tokens": 1273, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 1378.9, "prompt_tokens": 864, "eval_tokens": 69}], "respuesta": "La cursada de la materia Álgebra y Geometría Analítica es los martes de 10:00 a 12:00 horas y jueves de 10:00 a 12:00 horas, en el aula 102 del Campus Centro. El profesor que dicta esta materia es Ing. Ruiz.", "respuesta_chars": 207, "error": null}
+INFO:     127.0.0.1:63869 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63869 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:12,534 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:13,388 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:13,797 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:15,090 INFO asistente.request {"request_id": "ddaac7aa-323d-489e-8b33-4424d4343aa6", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3292.7, "mensaje_usuario": "¿qué información tenés sobre la materia Álgebra?", "tools": [{"nombre": "obtener_materia", "args": {"nombre_materia": "Álgebra"}, "duracion_ms": 2.0, "ok": true, "resultado_chars": 400, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 736.3, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 852.9, "prompt_tokens": 1084, "eval_tokens": 23}, {"fase": "final_streaming", "duracion_ms": 1698.5, "prompt_tokens": 521, "eval_tokens": 99}], "respuesta": "La materia de Álgebra y Geometría Analítica tiene una carga horaria de 6 horas. Es un curso obligatorio y no requiere ninguna correlativa previa. En el cuatrimestre actual (2026-1C), se dicta la comisión C1 en el aula 102 del Campus Centro, con horarios los martes y jueves de 10:00 a 12:00. El profesor responsable es Ing. Ruiz.", "respuesta_chars": 329, "error": null}
+INFO:     127.0.0.1:63890 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:17,555 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:18,340 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:18,788 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:19,084 INFO asistente.request {"request_id": "96e23d93-56db-4881-abf2-3dfd2b4707a1", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2181.0, "mensaje_usuario": "¿en qué sede la curso?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.1, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 652.0, "prompt_tokens": 311, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 785.3, "prompt_tokens": 1199, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 739.2, "prompt_tokens": 790, "eval_tokens": 23}], "respuesta": "La materia de Álgebra y Geometría Analítica se dicta en la Sede Campus Centro.", "respuesta_chars": 78, "error": null}
+INFO:     127.0.0.1:63907 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:21,560 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:22,023 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:22,368 INFO asistente.request {"request_id": "03c1c593-5bb9-4a7f-a2fa-6ea223d5eebf", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1472.3, "mensaje_usuario": "¿y el profesor quién es?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 664.4, "prompt_tokens": 313, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 805.3, "prompt_tokens": 481, "eval_tokens": 27}], "respuesta": "El profesor responsable para la comisión C1 de Álgebra y Geometría Analítica es Ing. Alejandro Ruiz.", "respuesta_chars": 100, "error": null}
+INFO:     127.0.0.1:63920 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:24,863 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:25,674 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:26,131 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:28:26,834 INFO asistente.request {"request_id": "cc785305-6ddf-44e4-b64e-47ff0f7da226", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2654.2, "mensaje_usuario": "¿y qué días y a qué hora tengo la cursada?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 0.8, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 684.1, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 810.0, "prompt_tokens": 1289, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 1156.6, "prompt_tokens": 880, "eval_tokens": 54}], "respuesta": "La cursada de Álgebra y Geometría Analítica, comisión C1, se dicta los martes de 10:00 a 12:00 en el Aula 102 del Campus Centro con Ing. Ruiz como profesor responsable.", "respuesta_chars": 168, "error": null}
+INFO:     127.0.0.1:49377 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49377 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:34,481 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:35,342 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:35,755 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:37,245 INFO asistente.request {"request_id": "342976db-d767-4ec0-bed5-632207a36c42", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3459.6, "mensaje_usuario": "¿qué información tenés sobre la materia Álgebra?", "tools": [{"nombre": "obtener_materia", "args": {"nombre_materia": "Álgebra"}, "duracion_ms": 3.5, "ok": true, "resultado_chars": 400, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 694.7, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 861.4, "prompt_tokens": 1084, "eval_tokens": 23}, {"fase": "final_streaming", "duracion_ms": 1889.8, "prompt_tokens": 521, "eval_tokens": 113}], "respuesta": "La materia Álgebra y Geometría Analítica es ofrecida en el cuatrimestre 1 del año académico 2026-1C. La carga horaria de la materia es de 6 horas semanales y no hay materias correlativas para esta sección. La comisión disponible es C1, con clases impartidas por Ing. Ruiz en el aula Aula 102 del Campus Centro. El horario de clase es los martes y jueves de 10:00 a 12:00 horas.", "respuesta_chars": 377, "error": null}
+INFO:     127.0.0.1:49390 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:39,711 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:41,037 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:41,038 INFO asistente.request {"request_id": "2496acba-bfdb-4566-8c75-0d06043b91fc", "id_alumno": 2, "estado": "error", "clasificacion": "ACADEMICA", "duracion_total_ms": 1968.5, "mensaje_usuario": "¿en qué sede la curso?", "tools": [{"nombre": "obtener_inscripciones", "args": {"sede": true, "aula": false, "profesor": false, "materia": false, "comision": false, "horario": false, "curso": false}, "duracion_ms": 0.0, "ok": false, "resultado_chars": 41, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'sede'"}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 641.8, "prompt_tokens": 311, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 1325.8, "prompt_tokens": 1213, "eval_tokens": 55}], "respuesta": "", "respuesta_chars": 0, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'sede'"}
+INFO:     127.0.0.1:49390 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:43,535 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:43,981 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:44,666 INFO asistente.request {"request_id": "af5973b5-311b-487b-adba-87cc4c54dcf1", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1815.5, "mensaje_usuario": "¿y el profesor quién es?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 684.7, "prompt_tokens": 313, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1128.0, "prompt_tokens": 456, "eval_tokens": 53}], "respuesta": "No encontré información sobre el profesor de la materia Álgebra y Geometría Analítica en el sistema. ¿Puedo ayudarte con algo más sobre tu carga académica o necesitas una guía para acceder a esa información?", "respuesta_chars": 207, "error": null}
+INFO:     127.0.0.1:55787 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:47,169 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:47,974 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:48,454 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:49,422 INFO asistente.request {"request_id": "c44acd16-89c5-4e24-bc01-6fbcd191d65a", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 2932.7, "mensaje_usuario": "¿y qué días y a qué hora tengo la cursada?", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 1.1, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 680.0, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 804.7, "prompt_tokens": 1290, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 1444.0, "prompt_tokens": 881, "eval_tokens": 74}], "respuesta": "La materia Álgebra y Geometría Analítica tiene dos horarios disponibles para ti: martes de 10:00 a 12:00 horas y jueves de 18:00 a 20:00 horas, ambas en el Aula 102 del Campus Centro. Ambos se imparten por parte del profesor Ing. Ruiz.", "respuesta_chars": 235, "error": null}
+INFO:     127.0.0.1:55804 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55804 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:52,166 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:53,062 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:53,063 INFO asistente.request {"request_id": "8b75dd4d-b07d-4089-8858-37cb2f9e9adf", "id_alumno": 2, "estado": "error", "clasificacion": "ACADEMICA", "duracion_total_ms": 1602.4, "mensaje_usuario": "Para que tengas contexto de mí: este año me puse como objetivo aprobar Álgebra sí o sí, porque la recursé y necesito terminarla antes de avanzar.", "tools": [{"nombre": "obtener_inscripciones", "args": {"periodo": "2026-1C"}, "duracion_ms": 0.0, "ok": false, "resultado_chars": 41, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'periodo'"}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 705.6, "prompt_tokens": 343, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 895.9, "prompt_tokens": 1111, "eval_tokens": 25}], "respuesta": "", "respuesta_chars": 0, "error": "TypeError: obtener_inscripciones() got an unexpected keyword argument 'periodo'"}
+INFO:     127.0.0.1:55804 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:55,536 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:55,980 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:56,066 INFO asistente.request {"request_id": "6d86d091-a392-4701-896c-358d8d4a833b", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1190.3, "mensaje_usuario": "¿qué día de la semana es hoy?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 660.1, "prompt_tokens": 313, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 527.5, "prompt_tokens": 322, "eval_tokens": 7}], "respuesta": "Hoy es martes.", "respuesta_chars": 14, "error": null}
+INFO:     127.0.0.1:55817 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:58,532 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:30:58,961 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:00,019 INFO asistente.request {"request_id": "e1017294-4268-45ec-8147-13d20cc7c9ab", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 2140.9, "mensaje_usuario": "contame un poco qué tipo de asistente sos y en qué me podés ayudar", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 654.0, "prompt_tokens": 324, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1484.3, "prompt_tokens": 357, "eval_tokens": 79}], "respuesta": "Soy Selene, tu asistente académica virtual. Me encargo de ayudarte con cualquier consulta que tengas relacionada con tus estudios en la carrera de Ingeniería en Sistemas de Información. Puedo ayudarte a encontrar información sobre materias, horarios, requisitos académicos, etc. ¿Necesitas algo en particular?", "respuesta_chars": 309, "error": null}
+INFO:     127.0.0.1:55824 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:02,394 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:02,847 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:03,007 INFO asistente.request {"request_id": "0a75b6e6-72e2-406e-b4b5-203c120c88cc", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1175.8, "mensaje_usuario": "cuánto es 120 mas 85", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 563.6, "prompt_tokens": 314, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 609.4, "prompt_tokens": 454, "eval_tokens": 13}], "respuesta": "Fácil! 120 + 85 = 205.", "respuesta_chars": 22, "error": null}
+INFO:     127.0.0.1:55831 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:05,492 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:06,318 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:06,778 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:09,595 INFO asistente.request {"request_id": "407b25e9-ba5c-45c8-b306-3f57af83cb85", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 4776.3, "mensaje_usuario": "dame mis inscripciones de este cuatrimestre", "tools": [{"nombre": "obtener_inscripciones", "args": {}, "duracion_ms": 0.9, "ok": true, "resultado_chars": 794, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 673.8, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 824.9, "prompt_tokens": 1246, "eval_tokens": 16}, {"fase": "final_streaming", "duracion_ms": 3273.5, "prompt_tokens": 838, "eval_tokens": 212}], "respuesta": "Carlos, para que puedas revisar tus inscripciones de este cuatrimestre, te muestro el resultado directo desde la base de datos de la institución. Tienes cuatro materias inscritas:\n\n- Álgebra y Geometría Analítica (C1) los martes de 10:00 a 12:00 en el Aula 102 del Campus Centro.\n- Análisis Matemático I (C2) los martes de 18:00 a 20:00 en el Aula 105 del Campus Norte.\n- Álgebra y Geometría Analítica (C1) los jueves de 10:00 a 12:00 en el Aula 102 del Campus Centro.\n- Análisis Matemático I (C2) los jueves de 18:00 a 20:00 en el Aula 105 del Campus Norte.\n\nSi necesitas más detalles o tienes alguna pregunta sobre tus horarios, no dudes en preguntar.", "respuesta_chars": 653, "error": null}
+INFO:     127.0.0.1:55843 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:12,042 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:13,027 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:13,523 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:14,724 INFO asistente.request {"request_id": "03eb8ab2-dc7f-49cf-a69b-8ba2666deae1", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3312.9, "mensaje_usuario": "¿qué notas tengo en mi historial académico?", "tools": [{"nombre": "obtener_historia_academica", "args": {}, "duracion_ms": 1.2, "ok": true, "resultado_chars": 557, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 630.4, "prompt_tokens": 316, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 985.3, "prompt_tokens": 1480, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 1692.7, "prompt_tokens": 950, "eval_tokens": 90}], "respuesta": "Carlos, tus notas actuales en tu historial académico son:\n\n* Álgebra y Geometría Analítica: desaprobada (3.00)\n* Análisis Matemático I: regularizada (5.00)\n* Sistemas y Organizaciones: promocionada (9.00)\n\nRecuerda que estas notas se refieren al cuatrimestre 2024-1C.", "respuesta_chars": 267, "error": null}
+INFO:     127.0.0.1:55853 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:17,205 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:18,123 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:18,668 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:21,388 INFO asistente.request {"request_id": "72525048-6c99-4e9b-b703-ef0ba7557b81", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 4849.0, "mensaje_usuario": "¿cuántas materias me faltan para recibirme?", "tools": [{"nombre": "obtener_materias_faltantes", "args": {}, "duracion_ms": 2.1, "ok": true, "resultado_chars": 1018, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 665.9, "prompt_tokens": 318, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 917.2, "prompt_tokens": 1593, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 3260.9, "prompt_tokens": 1272, "eval_tokens": 204}], "respuesta": "Carlos, según la información disponible en el sistema, todavía te faltan 10 materias para completar tu plan de estudio. Estas son:\n\n1. Algoritmos y Estructuras de Datos (2do cuatrimestre)\n2. Análisis Matemático II (2do cuatrimestre)\n3. Física I (2do cuatrimestre)\n4. Física II (2do cuatrimestre)\n5. Paradigmas de Programación (1er cuatrimestre)\n6. Sintaxis y Semántica de Lenguajes (1er cuatrimestre)\n7. Bases de Datos (2do cuatrimestre)\n8. Diseño de Sistemas (2do cuatrimestre)\n\nTe recomiendo consultar con tu asesor académico para obtener una evaluación más precisa de tus progresos y planificar un itinerario para completar tus materias faltantes.", "respuesta_chars": 650, "error": null}
+INFO:     127.0.0.1:55864 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:23,805 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:24,706 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:25,314 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:29,031 INFO asistente.request {"request_id": "c75ffded-890c-4344-8efe-e8250a2b2b81", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 5829.7, "mensaje_usuario": "mostrame el plan de estudios completo de mi carrera", "tools": [{"nombre": "obtener_plan_de_estudios", "args": {}, "duracion_ms": 2.6, "ok": true, "resultado_chars": 1107, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 603.0, "prompt_tokens": 317, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 901.6, "prompt_tokens": 1792, "eval_tokens": 17}, {"fase": "final_streaming", "duracion_ms": 4319.8, "prompt_tokens": 1497, "eval_tokens": 278}], "respuesta": "Carlos, el plan de estudios completo para tu carrera en Ingeniería en Sistemas de Información es el siguiente:\n\n* Álgebra y Geometría Analítica (6 créditos, primer cuatrimestre)\n* Análisis Matemático I (8 créditos, primer cuatrimestre)\n* Sistemas y Organizaciones (4 créditos, primer cuatrimestre)\n* Algoritmos y Estructuras de Datos (6 créditos, segundo cuatrimestre)\n* Análisis Matemático II (8 créditos, segundo cuatrimestre)\n* Física I (6 créditos, segundo cuatrimestre)\n* Física II (6 créditos, primer cuatrimestre del segundo año)\n* Paradigmas de Programación (6 créditos, primer cuatrimestre del segundo año)\n* Sintaxis y Semántica de Lenguajes (6 créditos, primer cuatrimestre del segundo año)\n* Bases de Datos (6 créditos, segundo cuatrimestre del segundo año)\n* Diseño de Sistemas (6 créditos, segundo cuatrimestre del segundo año)\n\nRecuerda que este plan de estudios es solo una guía y puedes consultar con tu asesor académico para obtener un itinerario personalizado.", "respuesta_chars": 979, "error": null}
+INFO:     127.0.0.1:55877 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:31,555 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:32,556 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:33,123 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:34,340 INFO asistente.request {"request_id": "d181c913-1d36-41f4-af8b-e1156baa1550", "id_alumno": 2, "estado": "ok", "clasificacion": "ACADEMICA", "duracion_total_ms": 3479.8, "mensaje_usuario": "¿qué materias podría cursar el cuatrimestre que viene?", "tools": [{"nombre": "consultar_materias_disponibles", "args": {}, "duracion_ms": 2.8, "ok": true, "resultado_chars": 219, "error": null}], "llm_calls": [{"fase": "clasificador", "duracion_ms": 695.6, "prompt_tokens": 319, "eval_tokens": 5}, {"fase": "inicial_con_tools", "duracion_ms": 1000.1, "prompt_tokens": 1988, "eval_tokens": 19}, {"fase": "final_streaming", "duracion_ms": 1778.2, "prompt_tokens": 1346, "eval_tokens": 92}], "respuesta": "Carlos, según la información disponible en el sistema, algunas materias que podrías cursar el cuatrimestre que viene son:\n\n* Algoritmos y Estructuras de Datos (cuatrimestre 2)\n* Física I (cuatrimestre 2)\n\nRecuerda consultar con tu asesor académico para obtener una evaluación más precisa de tus progresos y planificar un itinerario personalizado.", "respuesta_chars": 346, "error": null}
+INFO:     127.0.0.1:55887 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:36,790 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:37,409 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:38,152 INFO asistente.request {"request_id": "65ef44c9-2e97-43d7-ac7f-87ff83e6fc04", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1985.5, "mensaje_usuario": "buenísimo. una última curiosidad: ¿cómo te llamás?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 622.9, "prompt_tokens": 322, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1359.7, "prompt_tokens": 1317, "eval_tokens": 56}], "respuesta": "Carlos, me llamo Selene. Soy tu asistente académico virtual. Estoy aquí para ayudarte con cualquier consulta o pregunta que tengas sobre tus materias y plan de estudio. ¡Si necesitas algo más, no dudes en preguntar!", "respuesta_chars": 215, "error": null}
+INFO:     127.0.0.1:55899 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:40,588 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:41,182 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:41,731 INFO asistente.request {"request_id": "928150c1-4ad4-4539-9c5b-f60bc84e52a7", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1751.6, "mensaje_usuario": "perfecto. ¿tenés un chiste corto para distenderme un rato?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 607.6, "prompt_tokens": 323, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1141.0, "prompt_tokens": 1168, "eval_tokens": 42}], "respuesta": "¡Claro, Carlos! Un chiste corto: ¿Por qué la computadora fue al médico? ¡Porque tenía un virus! (espero que te haya hecho sonreír)", "respuesta_chars": 130, "error": null}
+INFO:     127.0.0.1:55907 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:44,184 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:44,758 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:51,028 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:51,031 INFO asistente.request {"request_id": "b30bcc0c-e7b9-4407-ad7e-af6d1b0d56ec", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 7477.5, "mensaje_usuario": "gracias. seguimos.", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 630.0, "prompt_tokens": 310, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 973.2, "prompt_tokens": 1114, "eval_tokens": 31}], "respuesta": "De nada, Carlos. Disfruta el resto de tu día y no dudes en preguntar si necesitas algo más. Hasta luego.", "respuesta_chars": 104, "error": null}
+INFO:     127.0.0.1:55925 - "POST /api/chat HTTP/1.1" 200 OK
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:53,536 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:54,163 INFO httpx HTTP Request: POST http://localhost:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-21 15:31:54,543 INFO asistente.request {"request_id": "52cc1e1b-31d1-48fd-941b-b279705dbf34", "id_alumno": 2, "estado": "ok", "clasificacion": "CONVERSACION", "duracion_total_ms": 1685.0, "mensaje_usuario": "ahora sí, volvamos al principio: ¿te acordás cuál era la materia que te dije al inicio que yo quería priorizar este año?", "tools": [], "llm_calls": [{"fase": "clasificador", "duracion_ms": 676.9, "prompt_tokens": 339, "eval_tokens": 4}, {"fase": "respuesta_conversacion", "duracion_ms": 1004.7, "prompt_tokens": 1370, "eval_tokens": 29}], "respuesta": "Carlos, no encontré ese dato en nuestro conversación anterior. Puedes recordarme sobre qué materia querías priorizar este año?", "respuesta_chars": 126, "error": null}

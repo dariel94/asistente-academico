@@ -1,0 +1,44 @@
+{
+  "dialogos": [
+    {
+      "dialogo_id": "MEM-A",
+      "alumno_legajo": "SIS-1002",
+      "id_alumno": 2,
+      "turnos_ejecutados": 4,
+      "turnos_correctos": 2,
+      "sumarizacion_disparada": false,
+      "turno_sumarizacion": null,
+      "estado_final": {
+        "filas_conversaciones": 6,
+        "resumen_presente": false,
+        "resumen_chars": 0,
+        "resumen_contenido": null
+      },
+      "resumen_keywords_check": null
+    },
+    {
+      "dialogo_id": "MEM-B",
+      "alumno_legajo": "SIS-1002",
+      "id_alumno": 2,
+      "turnos_ejecutados": 13,
+      "turnos_correctos": 12,
+      "sumarizacion_disparada": true,
+      "turno_sumarizacion": 12,
+      "estado_final": {
+        "filas_conversaciones": 12,
+        "resumen_presente": true,
+        "resumen_chars": 1267,
+        "resumen_contenido": "**Resumen de la conversación**\n\n*   **Hoy**: el día de la semana es martes.\n*   **Rol del asistente académico virtual (Selene)**: ayuda con consultas relacionadas a los estudios en la carrera de Ingeniería en Sistemas de Información.\n*   **Tareas realizadas**:\n    *   Calculó 120 + 85 = 205\n    *   Muestra las inscripciones del cuatrimestre actual (4 materias)\n        *   Álgebra y Geometría Analítica (C1) martes de 10:00 a 12:00 en Aula 102, Campus Centro\n        *   Análisis Matemático I (C2) martes de 18:00 a 20:00 en Aula 105, Campus Norte\n        *   Álgebra y Geometría Analítica (C1) jueves de 10:00 a 12:00 en Aula 102, Campus Centro\n        *   Análisis Matemático I (C2) jueves de 18:00 a 20:00 en Aula 105, Campus Norte\n    *   Muestra las notas actuales del historial académico (3 materias)\n        *   Álgebra y Geometría Analítica: desaprobada (3.00)\n        *   Análisis Matemático I: regularizada (5.00)\n        *   Sistemas y Organizaciones: promocionada (9.00)\n    *   Indica que faltan 10 materias para completar el plan de estudio, según la información disponible en el sistema.\n*   **Recomendación**: consultar con el asesor académico para obtener una evaluación más precisa y planificar un itinerario para completar las materias faltantes."
+      },
+      "resumen_keywords_check": {
+        "esperadas": [
+          "lgebra"
+        ],
+        "presentes": [
+          "lgebra"
+        ],
+        "faltantes": []
+      }
+    }
+  ]
+}
