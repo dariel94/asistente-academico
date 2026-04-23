@@ -1,7 +1,7 @@
+agregar graficos, imagenes, diagramas de flujo, modelos, etc
 armar conclusiones, con resultados, problemas encontrados, puntos claves, cumplimiento de requerimientos
 
 FINAL: 
-agregar graficos, imagenes, diagramas de flujo, modelos, etc
 ver referencias al anexo en tesis.md (hace falta un anexo?)
 tests de codigo
 crear readme para el proyecto en github
@@ -11,3 +11,8 @@ hace falta sumar anexo con el codigo?
 normas de redaccion, tipografias, portadas, encabezados, citas, links, bibliografia
 van imagenes? pruebas en videos?
 vale la pena mencionar nombres de scripts o archivos del proyecto?
+cuanto es el contenido tecnico que debe ir en la tesis?
+
+
+otros
+ver porque el legajo SIS-1001 no tiene materias disponibles para inscripcion

@@ -80,7 +80,7 @@ TOOLS_CATALOG = [
                 "properties": {
                     "nombre_materia": {
                         "type": "string",
-                        "description": "Nombre o parte del nombre de la materia a buscar",
+                        "description": "Nombre o fragmento del nombre de la materia a buscar",
                     }
                 },
                 "required": ["nombre_materia"],
