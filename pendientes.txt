@@ -1,3 +1,4 @@
+revisar si el punto 4 esta alineado con la implemetacion
 agregar graficos, imagenes, diagramas de flujo, modelos, etc
 armar conclusiones, con resultados, problemas encontrados, puntos claves, cumplimiento de requerimientos
 
