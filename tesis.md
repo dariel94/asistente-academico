@@ -1,4 +1,4 @@
-Asistente Académico: Agente Conversacional con Tool Calling
+# Asistente Académico: Agente Conversacional con Tool Calling
 
 ## Índice
 
@@ -13,11 +13,11 @@ Asistente Académico: Agente Conversacional con Tool Calling
   - [2.3. Generación Aumentada por Recuperación (RAG) y Bases de Datos Vectoriales](#23-generación-aumentada-por-recuperación-rag-y-bases-de-datos-vectoriales)
   - [2.4. Estrategias de Memoria en Agentes Conversacionales](#24-estrategias-de-memoria-en-agentes-conversacionales)
 - [Capítulo 3: Análisis de Requerimientos](#capítulo-3-análisis-de-requerimientos)
-  - [3.1. Requerimientos Funcionales](#31-requerimientos-funcionales-rf)
-  - [3.2. Requerimientos No Funcionales](#32-requerimientos-no-funcionales-rnf)
+  - [3.1. Requerimientos Funcionales (RF)](#31-requerimientos-funcionales-rf)
+  - [3.2. Requerimientos No Funcionales (RNF)](#32-requerimientos-no-funcionales-rnf)
 - [Capítulo 4: Diseño de la Arquitectura del Sistema](#capítulo-4-diseño-de-la-arquitectura-del-sistema)
-  - [4.1. Diseño de la Base de Datos Híbrida](#41-diseño-de-la-base-de-datos-híbrida-relacional--vectorial)
-  - [4.2. Arquitectura del Servidor MCP y Definición de Tools](#42-arquitectura-del-servidor-mcp-y-definición-de-herramientas-tools)
+  - [4.1. Diseño de la Base de Datos Híbrida (Relacional + Vectorial)](#41-diseño-de-la-base-de-datos-híbrida-relacional--vectorial)
+  - [4.2. Arquitectura del Servidor MCP y Definición de Herramientas (Tools)](#42-arquitectura-del-servidor-mcp-y-definición-de-herramientas-tools)
   - [4.3. El Motor de IA: Fundamentos y Optimización de Llama 3.1 8B](#43-el-motor-de-ia-fundamentos-y-optimización-de-llama-31-8b)
   - [4.4. Arquitectura del Orquestador (Backend FastAPI)](#44-arquitectura-del-orquestador-backend-fastapi)
   - [4.5. Modelo de Seguridad: Inyección de Perfil y Prompt Hardening](#45-modelo-de-seguridad-inyección-de-perfil-y-prompt-hardening)
@@ -25,19 +25,21 @@ Asistente Académico: Agente Conversacional con Tool Calling
 - [Capítulo 5: Implementación y Desarrollo](#capítulo-5-implementación-y-desarrollo)
   - [5.1. Entorno de Ejecución y Hardware](#51-entorno-de-ejecución-y-hardware)
   - [5.2. Implementación del Servidor de Base de Datos y Almacenamiento](#52-implementación-del-servidor-de-base-de-datos-y-almacenamiento)
-  - [5.3. Desarrollo del Servidor MCP](#53-desarrollo-del-servidor-mcp-model-context-protocol)
+  - [5.3. Desarrollo del Servidor MCP (Model Context Protocol)](#53-desarrollo-del-servidor-mcp-model-context-protocol)
   - [5.4. Servidor de Inferencia: Ollama](#54-servidor-de-inferencia-ollama)
   - [5.5. Orquestación del Agente y Consumo de Herramientas](#55-orquestación-del-agente-y-consumo-de-herramientas)
   - [5.6. Interfaz de Usuario y Flujo de Sesión Académica](#56-interfaz-de-usuario-y-flujo-de-sesión-académica)
   - [5.7. Flujo Completo de Sesión Académica](#57-flujo-completo-de-sesión-académica)
-  - [5.8. Orquestación de Servicios y Arranque de la Aplicación.](#58-orquestación-de-servicios-y-arranque-de-la-aplicación)
+  - [5.8. Orquestación de Servicios y Arranque de la Aplicación](#58-orquestación-de-servicios-y-arranque-de-la-aplicación)
+  - [5.9. Pruebas Unitarias](#59-pruebas-unitarias)
 - [Capítulo 6: Evaluación y Resultados](#capítulo-6-evaluación-y-resultados)
   - [6.1. Instrumentación del Agente y Sistema de Logging Estructurado](#61-instrumentación-del-agente-y-sistema-de-logging-estructurado)
   - [6.2. Pruebas de Precisión en Respuestas y Tool Calling](#62-pruebas-de-precisión-en-respuestas-y-tool-calling)
   - [6.3. Evaluación de Rendimiento (Latencia y Consumo Local de Tokens)](#63-evaluación-de-rendimiento-latencia-y-consumo-local-de-tokens)
-  - [6.4. Validación de Seguridad y Resistencia a Inyecciones](#64-validación-de-seguridad-rate-limit-y-resistencia-a-inyecciones)
+  - [6.4. Validación de Seguridad, Rate Limit y Resistencia a Inyecciones](#64-validación-de-seguridad-rate-limit-y-resistencia-a-inyecciones)
   - [6.5. Evaluación de la Memoria Conversacional Híbrida](#65-evaluación-de-la-memoria-conversacional-híbrida)
 - [Capítulo 7: Conclusiones y Posibles Mejoras](#capítulo-7-conclusiones-y-posibles-mejoras)
+- [Capítulo 8: Bibliografía](#capítulo-8-bibliografía)
 
 ---
 
@@ -1502,7 +1504,7 @@ sequenceDiagram
 
 ---
 
-### 5.8. Orquestación de Servicios y Arranque de la Aplicación.
+### 5.8. Orquestación de Servicios y Arranque de la Aplicación
 
 El entorno de ejecución quedó compuesto de cuatro procesos:
 
@@ -1547,6 +1549,27 @@ El script encadena las siguientes etapas:
 6. **Manejo de señales**: un `trap` sobre `SIGINT` y `SIGTERM` garantiza que al interrumpir la sesión con `Ctrl+C` se envíe `kill` a todos los PIDs registrados, deteniendo backend y frontend de forma ordenada sin dejar procesos huérfanos.
 
 Cabe aclarar que `start.sh` intencionalmente no gestiona PostgreSQL ni Ollama como procesos hijos: ambos se asumen instalados y en ejecución como servicios del sistema operativo. Esta separación refleja la naturaleza persistente de un motor de base de datos y de un servidor de modelos —que conviene mantener activos entre sesiones para evitar recargar los pesos del LLM en memoria— frente a la naturaleza efímera del backend y el frontend en modo desarrollo, que se reinician con cada cambio de código.
+
+### 5.9. Pruebas Unitarias
+
+Como fase final de la implementación, se incorporó una suite de **pruebas unitarias** sobre los componentes individuales de backend y frontend. El objetivo de esta capa es distinto al de la evaluación funcional: no busca medir la calidad de las respuestas del agente, sino verificar que las piezas de la arquitectura funcionan como se espera de manera aislada, sin depender de PostgreSQL, Ollama ni red. Esto permite detectar regresiones de forma rápida durante el desarrollo y acotar el origen de cualquier falla a un módulo específico.
+
+**Backend (Python).** La suite se organiza bajo `tests/` y cubre los seis módulos centrales de la lógica del backend con sus dependencias externas mockeadas (`unittest.mock.AsyncMock` para el pool `asyncpg` y `httpx.MockTransport` para Ollama):
+
+- `app.services.rate_limit` — Verifica el comportamiento de la ventana deslizante en condiciones normales, en el límite, al excederlo, ante el avance del reloj y con aislamiento entre alumnos.
+- `app.services.auth` — Cubre la emisión y validación de tokens JWT (firma incorrecta, expiración, `sub` no numérico, alumno inexistente) y la dependencia `get_current_user` ante header ausente, malformado o token roto.
+- `app.services.request_logger` — Comprueba la acumulación de tools y llamadas al LLM, los setters de error y clasificación, y la emisión final como una única línea JSON con caracteres en español preservados.
+- `app.services.memory` — Valida el armado del contexto con y sin resumen previo, el disparo de la sumarización al superar el umbral, y el ciclo completo de compresión (incluyendo la URL exacta llamada en Ollama y los `INSERT`/`DELETE` ejecutados sobre la base).
+- `app.services.agent` (helpers) — Verifica el detector de tool-calls emitidos como texto, la sustitución de placeholders del system prompt y la presencia de las reglas absolutas tras el formateo.
+- `app.mcp.server` — Cubre la convención de `periodo_vigente()` (cuatrimestre 1 vs 2 con corte exacto en julio/agosto), el registro de tools vía decorador, la propagación del `SessionContext` a través de `ContextVar`, y la coherencia entre el catálogo expuesto al modelo y el dispatcher interno —en particular, que las cinco tools de datos personales declaren un esquema de parámetros vacío, propiedad de seguridad central descrita en la sección 4.5.4—.
+
+**Frontend (TypeScript / React).** La suite se ejecuta con Vitest sobre tres archivos:
+
+- `useChat.test.ts` — Prueba el reducer de la conversación en sus seis acciones (envío de mensaje, cambio de estado del agente, inicio de respuesta, agregado de chunk en streaming, finalización y error), garantizando que las transiciones sean predecibles y que el streaming token a token se concatene correctamente sobre el último mensaje del asistente.
+- `api.test.ts` — Cubre el cliente HTTP del frontend: el manejo de los códigos de respuesta (200, 401 traducido a `SESSION_EXPIRED`, 429 con mensaje específico de rate limit, 500) y, especialmente, el parser de Server-Sent Events, que debe tolerar líneas partidas en múltiples *reads* de red, eventos sin `\n\n` final y comentarios SSE que no son `data:`.
+- `StatusIndicator.test.tsx` — Valida el mapeo de cada `EstadoAgente` a su etiqueta visible para el alumno, incluyendo el caso de `consultando_db` con y sin nombre de herramienta.
+
+En conjunto, la suite contiene **100 pruebas** (72 en backend y 28 en frontend) que se ejecutan en pocos segundos y no requieren infraestructura externa.
 
 ---
 
