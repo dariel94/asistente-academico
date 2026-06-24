@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(wmic diskdrive *)"
+      "Bash(wmic diskdrive *)",
+      "Bash(where pandoc *)",
+      "Bash(where wkhtmltopdf *)",
+      "Bash(npx --version)",
+      "WebSearch"
     ]
   }
 }

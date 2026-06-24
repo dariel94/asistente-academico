@@ -12,6 +12,7 @@
   - [2.2. Model Context Protocol (MCP)](#22-model-context-protocol-mcp)
   - [2.3. Generación Aumentada por Recuperación (RAG) y Bases de Datos Vectoriales](#23-generación-aumentada-por-recuperación-rag-y-bases-de-datos-vectoriales)
   - [2.4. Estrategias de Memoria en Agentes Conversacionales](#24-estrategias-de-memoria-en-agentes-conversacionales)
+  - [2.5. Estado del Arte: Trabajos Relacionados y Posicionamiento](#25-estado-del-arte-trabajos-relacionados-y-posicionamiento)
 - [Capítulo 3: Análisis de Requerimientos](#capítulo-3-análisis-de-requerimientos)
   - [3.1. Requerimientos Funcionales (RF)](#31-requerimientos-funcionales-rf)
   - [3.2. Requerimientos No Funcionales (RNF)](#32-requerimientos-no-funcionales-rnf)
@@ -22,6 +23,7 @@
   - [4.4. Arquitectura del Orquestador (Backend FastAPI)](#44-arquitectura-del-orquestador-backend-fastapi)
   - [4.5. Modelo de Seguridad: Inyección de Perfil y Prompt Hardening](#45-modelo-de-seguridad-inyección-de-perfil-y-prompt-hardening)
   - [4.6. Diseño de la Interfaz de Usuario](#46-diseño-de-la-interfaz-de-usuario)
+  - [4.7. Diseño Orientado a la Escalabilidad Horizontal](#47-diseño-orientado-a-la-escalabilidad-horizontal)
 - [Capítulo 5: Implementación y Desarrollo](#capítulo-5-implementación-y-desarrollo)
   - [5.1. Entorno de Ejecución y Hardware](#51-entorno-de-ejecución-y-hardware)
   - [5.2. Implementación del Servidor de Base de Datos y Almacenamiento](#52-implementación-del-servidor-de-base-de-datos-y-almacenamiento)
@@ -99,9 +101,9 @@ La denominación "Grandes" refiere no sólo al volumen de datos de entrenamiento
 
 Esta sección analiza los pilares que permiten a estos modelos actuar como motores de razonamiento para el ámbito académico:
 
-- **Arquitectura Transformer y Mecanismo de Atención:** A diferencia de las arquitecturas antiguas (como las RNN), los Transformers utilizan el mecanismo de Auto-Atención (Self-Attention). Este permite al modelo asignar pesos de importancia a cada palabra de una frase de forma simultánea, comprendiendo el contexto global y las relaciones de dependencia a larga distancia. Esto es crucial para interpretar consultas académicas complejas donde el sujeto y la acción pueden estar separados por múltiples cláusulas.
+- **Arquitectura Transformer y Mecanismo de Atención:** A diferencia de las arquitecturas antiguas (como las RNN), los Transformers utilizan el mecanismo de Auto-Atención (Self-Attention), introducido por Vaswani et al. (2017). Este permite al modelo asignar pesos de importancia a cada palabra de una frase de forma simultánea, comprendiendo el contexto global y las relaciones de dependencia a larga distancia. Esto es crucial para interpretar consultas académicas complejas donde el sujeto y la acción pueden estar separados por múltiples cláusulas.
 
-- **Capacidad de Razonamiento y Comportamiento Agéntico (Tool Use):** Los LLMs de última generación han trascendido la generación de texto creativa para desarrollar capacidades de planificación. El modelo puede identificar la necesidad de información externa, seleccionar la herramienta adecuada y procesar el resultado de una consulta técnica para traducirlo a una respuesta amigable. Este comportamiento transforma al LLM de un simple chatbot a un agente capaz de orquestar tareas.
+- **Capacidad de Razonamiento y Comportamiento Agéntico (Tool Use):** Los LLMs de última generación han trascendido la generación de texto creativa para desarrollar capacidades de planificación. Esta habilidad para seguir instrucciones complejas e interactuar con herramientas externas es un resultado directo del refinamiento mediante aprendizaje por refuerzo con retroalimentación humana (RLHF), formalizado por Ouyang et al. (2022). El modelo puede identificar la necesidad de información externa, seleccionar la herramienta adecuada y procesar el resultado de una consulta técnica para traducirlo a una respuesta amigable. Este comportamiento transforma al LLM de un simple chatbot a un agente capaz de orquestar tareas.
 
 - **Ventana de Contexto y Tokenización:** La "memoria de trabajo" del modelo está limitada por su ventana de contexto (cantidad máxima de tokens que puede procesar en un turno). Para el caso de estudio se requiere un modelo con una ventana amplia que permita procesar simultáneamente el historial de conversaciones, las instrucciones de seguridad y los datos recuperados de las bases de datos, garantizando que la respuesta final esté fundamentada en hechos.
 
@@ -119,7 +121,7 @@ El Model Context Protocol (MCP) es el estándar abierto que permite la interoper
 
 ### 2.3. Generación Aumentada por Recuperación (RAG) y Bases de Datos Vectoriales
 
-La técnica de Retrieval-Augmented Generation (RAG) permite que el modelo de lenguaje consulte fuentes de información externas y no estructuradas (como archivos PDF o manuales) antes de generar una respuesta. Es el mecanismo que dota al asistente de una "memoria de consulta" externa.
+La técnica de Retrieval-Augmented Generation (RAG), introducida por Lewis et al. (2020), permite que el modelo de lenguaje consulte fuentes de información externas y no estructuradas (como archivos PDF o manuales) antes de generar una respuesta. Es el mecanismo que dota al asistente de una "memoria de consulta" externa.
 
 - **El Concepto de RAG:** A diferencia de un LLM estándar que responde basado únicamente en su entrenamiento previo, un sistema RAG funciona bajo la lógica de un "examen a libro abierto". Ante una consulta sobre un plan de estudios, el sistema primero recupera los fragmentos más relevantes de los documentos institucionales y se los entrega al modelo como contexto para que este redacte la respuesta final.
 
@@ -140,6 +142,36 @@ Los modelos de lenguaje son, por naturaleza, sistemas sin estado (stateless); no
 - **Memoria a Largo Plazo mediante Sumarización Dinámica:** Para evitar el desbordamiento de la ventana de contexto en sesiones extensas, se aplica una técnica de compresión. Cuando el historial supera un umbral crítico, el modelo genera un resumen ejecutivo de los puntos clave discutidos hasta el momento. Este resumen se adjunta como un "prefacio" en los siguientes prompts, permitiendo que el bot "recuerde" temas tratados hace 50 mensajes sin ocupar espacio innecesario.
 
 - **Gestión de Estado Híbrida:** En este trabajo se propone una arquitectura que combina ambas estrategias dentro del alcance de una sesión. Los mensajes recientes se almacenan de forma relacional (SQL) para su recuperación rápida, mientras que los resúmenes acumulados aseguran que la persistencia del contexto no afecte los tiempos de respuesta del servidor local. Al iniciar una nueva sesión (login), el historial y los resúmenes previos se eliminan, garantizando que cada sesión comience con un contexto limpio.
+
+### 2.5. Estado del Arte: Trabajos Relacionados y Posicionamiento
+
+Las secciones anteriores presentaron los fundamentos teóricos sobre los que se apoya este trabajo. Esta sección los sitúa frente al estado del arte: revisa cómo otros trabajos han aplicado LLMs, RAG y comportamiento agéntico a la asistencia conversacional —en particular en el ámbito educativo— e identifica las brechas que motivan las decisiones arquitectónicas de este proyecto.
+
+#### 2.5.1. Maduración de RAG y de los Agentes con Herramientas
+
+La combinación de recuperación de información y generación se ha consolidado como la estrategia dominante para mitigar las limitaciones intrínsecas de los LLMs —alucinaciones, conocimiento desactualizado y razonamiento no trazable—. El relevamiento sistemático de Gao et al. (2024) documenta la evolución del paradigma RAG desde sus formulaciones iniciales hacia arquitecturas modulares y avanzadas. Sobre esa base, una segunda línea de investigación describe la convergencia entre RAG y el comportamiento agéntico: los trabajos sobre *Agentic RAG* (Singh et al., 2025) caracterizan sistemas en los que el LLM no solo recupera contexto pasivamente, sino que decide de forma autónoma qué herramienta invocar, con qué parámetros y en qué momento. Este es exactamente el paradigma adoptado en el presente trabajo, donde el modelo selecciona dinámicamente entre un catálogo de herramientas MCP —tanto consultas SQL estructuradas como búsqueda vectorial— según la intención detectada.
+
+#### 2.5.2. Asistentes Conversacionales en el Ámbito Educativo
+
+En el dominio universitario específico existe un cuerpo creciente de trabajos que aplican LLM + RAG a la asistencia académica:
+
+- **Tutoría con RAG en educación superior:** Modran et al. (2024) proponen un agente inteligente que recupera información de material curricular curado (apuntes, diapositivas, documentos organizativos) para ofrecer asistencia personalizada a estudiantes, utilizando un agente de *function calling* para acceder a las herramientas de recuperación.
+
+- **Memoria aumentada en sistemas de gestión del aprendizaje (LMS):** trabajos recientes (Applied Sciences, MDPI, 2025) integran mecanismos de memoria a LLMs para enriquecer los servicios de chatbot dentro de plataformas LMS universitarias, abordando la persistencia del contexto conversacional —una preocupación compartida con la sección 2.4 de este trabajo—.
+
+- **Atención institucional con RAG:** se han desplegado chatbots con recuperación aumentada para resolver consultas administrativas y orientar a aspirantes (por ejemplo, en jornadas de puertas abiertas universitarias), demostrando la viabilidad del enfoque para canalizar demanda informativa repetitiva.
+
+- **Asistentes en español con base híbrida:** un caso particularmente cercano es NOVA, un asistente educativo que opera íntegramente en español y combina RAG con bases de datos vectoriales y relacionales, validando la pertinencia de la arquitectura de almacenamiento unificado adoptada aquí (sección 4.1).
+
+#### 2.5.3. Brechas Identificadas y Posicionamiento del Trabajo
+
+La revisión anterior revela dos brechas recurrentes que este proyecto aborda de forma deliberada:
+
+- **Dependencia de la nube frente a ejecución local:** la mayoría de los trabajos relevados delega la inferencia en APIs propietarias (OpenAI, Anthropic, Google), lo que implica costos variables por uso y, de modo más crítico para una institución educativa, la salida de datos académicos sensibles hacia infraestructura de terceros. Este trabajo prioriza un enfoque *local-first* con Llama 3.1 8B ejecutado sobre hardware accesible, alineado con el requerimiento de soberanía y privacidad (sección 1.4).
+
+- **Integración a medida frente a contrato estandarizado:** las soluciones existentes suelen resolver la conexión entre el modelo y las fuentes de datos con código específico o frameworks de orquestación particulares (p. ej. LangChain), lo que dificulta la portabilidad entre instituciones. Este trabajo adopta el Model Context Protocol (MCP) como contrato estandarizado y agnóstico al Sistema de Información Académica, de modo que la lógica del agente permanezca intacta al migrar de motor de datos (sección 2.2).
+
+En síntesis, el aporte diferencial de este trabajo no reside en ninguno de sus componentes individuales —RAG, tool calling, memoria híbrida son técnicas establecidas— sino en su integración específica bajo restricciones que la literatura rara vez satisface de forma simultánea: *tool calling* sobre un LLM de **ejecución local**, mediado por el **contrato estandarizado MCP**, sobre una **base híbrida** PostgreSQL/pgvector, y evaluado bajo un **modelo de amenazas explícito** (autenticación, *prompt injection*, *SQL injection* y *rate limit*) que la mayoría de los prototipos académicos no aborda.
 
 ---
 
@@ -658,6 +690,80 @@ stateDiagram-v2
 ```
 
 *Figura 4.5. Diagrama de estados del agente expuestos en la interfaz. Los identificadores (`idle`, `procesando`, `consultando_db`, `buscando_docs`, `generando`, `error`) corresponden uno a uno con los valores del reducer `ChatAction.SET_ESTADO` (sección 5.6.3) y con los eventos `estado` emitidos por SSE desde el orquestador (sección 5.5.2). El texto entre paréntesis es la etiqueta visible que mapea `StatusIndicator` para el alumno (sección 5.6.4).*
+
+### 4.7. Diseño Orientado a la Escalabilidad Horizontal
+
+El alcance de este trabajo contempla un despliegue de **instancia única** sobre hardware de consumo (ver sección 5.1), suficiente para validar la arquitectura sobre un entorno académico simulado. No obstante, varias decisiones de diseño se tomaron deliberadamente para que el sistema pueda **escalar de forma horizontal** —replicando instancias del backend detrás de un balanceador de carga— sin reescribir su lógica central. Esta sección documenta esas decisiones y delimita con honestidad qué queda como trabajo futuro.
+
+La distinción operativa relevante es entre escalar **verticalmente** (agregar recursos a un solo servidor) y **horizontalmente** (agregar más servidores que reparten la carga). El segundo enfoque es el que habilita la disponibilidad y la tolerancia a fallos propias de un servicio institucional real, pero solo es posible si el backend cumple una condición: que cualquier instancia pueda atender cualquier petición de cualquier usuario, sin depender de estado almacenado localmente en esa instancia. Las subsecciones siguientes describen cómo la arquitectura satisface esa condición.
+
+#### 4.7.1. Backend sin Estado (Stateless) mediante Autenticación JWT
+
+El orquestador FastAPI se diseñó como un servicio **sin estado de sesión en el servidor**. La identidad del alumno no se almacena en una sesión en memoria del proceso, sino que viaja firmada dentro del **token JWT** que el cliente adjunta en cada request (sección 4.5.1). En cada llamada, el backend valida la firma y la expiración del token y reconstruye el `SessionContext` releyendo el perfil del alumno desde la base de datos.
+
+La consecuencia directa es que el backend no guarda nada entre requests que sea necesario para atender la siguiente: dos peticiones consecutivas del mismo alumno pueden ser atendidas por dos instancias distintas del backend sin pérdida de coherencia, porque toda la información de identidad se reconstruye desde el token y desde la base compartida. Esta propiedad —**ausencia de afinidad de sesión** (*session affinity*)— es la que permite que un balanceador distribuya las peticiones entrantes con cualquier política (por ejemplo, *round-robin*) sin necesidad de asignar a cada usuario a un servidor concreto.
+
+#### 4.7.2. Estado Conversacional Externalizado a la Base de Datos
+
+El segundo requisito para la replicación es que la **memoria conversacional** —que sí es estado mutable por naturaleza— tampoco resida en la memoria del proceso. En esta arquitectura, el `MemoryManager` persiste el historial y los resúmenes acumulados de cada sesión en PostgreSQL (secciones 4.4.1 y 5.5.3), no en estructuras en memoria del backend. Antes de construir el prompt de cada turno, el contexto conversacional se **recupera desde la base**.
+
+Al delegar el estado conversacional a la capa de datos compartida, el backend conserva su naturaleza *stateless*: una instancia que reciba el segundo mensaje de una conversación iniciada en otra instancia recupera el contexto completo desde PostgreSQL sin haber participado del primer turno. El estado existe, pero vive en un único lugar compartido por todas las réplicas.
+
+#### 4.7.3. Pool de Conexiones y Servidor de Datos Dedicado
+
+Cada instancia del backend administra su propio **pool de conexiones `asyncpg`** contra PostgreSQL (`min_size=2`, `max_size=10`; ver sección 5.3.1), reutilizando conexiones abiertas en lugar de establecer una nueva por consulta. Esto acota el costo de apertura de conexiones bajo concurrencia y mantiene previsible el número de conexiones que cada réplica abre contra la base.
+
+En un escenario escalado, la base de datos se aloja en un **servidor dedicado** al que apuntan todas las réplicas del backend a través de la variable de entorno `DATABASE_URL` (sección 5.3.1), que externaliza la cadena de conexión y evita credenciales incrustadas en el código. Centralizar los datos en un único servidor garantiza una **fuente de verdad consistente** a la vez que permite dimensionar ese nodo de forma independiente del cómputo del orquestador. El presupuesto agregado de conexiones (réplicas × `max_size`) es el parámetro clave al sumar instancias, y se ajusta mediante el límite `max_connections` de PostgreSQL o interponiendo un *pooler* externo como PgBouncer.
+
+#### 4.7.5. Topología de Despliegue Escalado
+
+La combinación de las propiedades anteriores habilita la topología de la Figura 4.6: un balanceador de carga recibe las conexiones HTTPS de los alumnos y las distribuye entre N réplicas idénticas del backend; cada réplica **contiene su propio motor de inferencia** (Ollama sobre su GPU), de modo que sumar una réplica suma a la vez capacidad de orquestación y de inferencia, sin un recurso de cómputo compartido entre ellas. Todas las réplicas comparten únicamente el servidor de base de datos dedicado, que actúa como fuente de verdad del estado.
+
+```mermaid
+flowchart TB
+    U1(["Alumno"]) -- "HTTPS" --> LB["Balanceador de carga"]
+    U2(["Alumno"]) -- "HTTPS" --> LB
+    U3(["Alumno"]) -- "HTTPS" --> LB
+
+    LB -- "round-robin" --> BE1
+    LB -- "round-robin" --> BE2
+    LB -- "round-robin" --> BEN
+
+    subgraph R1["Réplica 1"]
+        BE1["Backend FastAPI<br/>(stateless)"]
+        INF1["Ollama · GPU"]
+        BE1 -- "chat + tools" --> INF1
+    end
+    subgraph R2["Réplica 2"]
+        BE2["Backend FastAPI<br/>(stateless)"]
+        INF2["Ollama · GPU"]
+        BE2 -- "chat + tools" --> INF2
+    end
+    subgraph RN["Réplica N"]
+        BEN["Backend FastAPI<br/>(stateless)"]
+        INFN["Ollama · GPU"]
+        BEN -- "chat + tools" --> INFN
+    end
+
+    BE1 -- "pool asyncpg" --> DB[("PostgreSQL + pgvector<br/>servidor dedicado")]
+    BE2 -- "pool asyncpg" --> DB
+    BEN -- "pool asyncpg" --> DB
+
+    classDef rep fill:#f5f7fa,stroke:#334155,stroke-width:1px,color:#111;
+    class R1,R2,RN rep;
+```
+
+*Figura 4.6. Topología de despliegue escalado horizontalmente.*
+
+#### 4.7.6. Límites Conocidos y Trabajo Futuro
+
+El diseño orienta el sistema hacia la escalabilidad, pero su **validación bajo alta demanda queda fuera del alcance** de esta tesis. Dos puntos honestos delimitan el trabajo pendiente:
+
+- **La capacidad de inferencia escala con las réplicas, pero no se validó bajo carga.** Sumar réplicas incrementa de forma conjunta la capacidad de orquestación y la de inferencia, sin un recurso de cómputo compartido que actúe como cuello de botella. Lo que queda pendiente es la verificación empírica: medir, sobre un despliegue con múltiples réplicas, cómo evoluciona la latencia y el *throughput* del sistema a medida que crece la concurrencia real.
+
+- **El control de tasa es local a cada instancia.** El *rate limit* por alumno se mantiene hoy en una estructura en memoria del proceso (sección 6.4.4). Con múltiples réplicas, ese límite dejaría de ser global: cada instancia contaría las requests que ella misma atiende. Llevarlo a un despliegue escalado correctamente requiere **externalizar el contador a un almacén compartido** o en su defecto, dentro del propio PostgreSQL, de modo que el cupo se aplique de forma consistente independientemente de la réplica que reciba cada petición.
+
+En síntesis, la arquitectura se diseñó para escalar horizontalmente —backend *stateless*, estado externalizado, identidad por petición— pero el **despliegue productivo a gran escala con múltiples instancias, balanceador y pruebas de carga y *stress* con concurrencia masiva real** se documenta como línea de trabajo futuro (ver Capítulo 7), no como resultado validado de este trabajo.
 
 ---
 
@@ -2122,6 +2228,8 @@ Sobre las líneas de trabajo futuras, la evaluación del Capítulo 6 dejó seña
 
 La segunda avenida es el **refuerzo del prompt hardening frente a la exfiltración del propio system prompt**. El único caso de prompt injection que no fue bloqueado (PI-02) logró que el modelo transcribiera su propio prompt en la respuesta. Aunque el impacto de seguridad es bajo —los datos expuestos son los del propio usuario autenticado, no de otros alumnos—, la fuga del diseño interno es prevenible con técnicas complementarias como la separación del prompt en varios turnos sintéticos o la adición de un filtro de salida que detecte y redacte fragmentos del prompt si aparecieran en la respuesta.
 
+La tercera avenida es la **validación de la escalabilidad horizontal** que la arquitectura ya contempla por diseño (sección 4.7). El backend se construyó como un servicio *stateless* —identidad derivada del token JWT en cada petición y estado conversacional externalizado a PostgreSQL—, lo que en principio habilita replicar instancias detrás de un balanceador de carga sobre un servidor de base de datos dedicado. En esa topología cada réplica contiene su propio motor de inferencia (Ollama sobre GPU), de modo que sumar instancias aporta de forma conjunta capacidad de orquestación y de inferencia. Lo que queda pendiente es la verificación empírica de esa propiedad: un despliegue productivo con múltiples instancias y pruebas de carga y *stress* con concurrencia masiva real, que permitan medir cómo evolucionan la latencia y el *throughput* del sistema bajo alta demanda.
+
 En conjunto, este trabajo aportó un marco replicable para que otras instituciones con restricciones similares —presupuesto acotado, exigencias de privacidad, hardware de consumo— puedan adoptar capacidades de IA conversacional sin ceder control sobre sus datos ni sobre la evolución del sistema. El asistente queda operativo; lo que sigue es usarlo, medirlo con alumnos reales y continuar refinando los puntos que la propia evaluación ya señaló.
 
 ---
@@ -2143,10 +2251,18 @@ En conjunto, este trabajo aportó un marco replicable para que otras institucion
 ### RAG, embeddings y búsqueda vectorial
 
 - Lewis, P. et al. *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks.* arXiv:2005.11401, 2020. https://arxiv.org/abs/2005.11401
+- Gao, Y. et al. *Retrieval-Augmented Generation for Large Language Models: A Survey.* arXiv:2312.10997, 2024. https://arxiv.org/abs/2312.10997
+- Singh, A. et al. *Agentic Retrieval-Augmented Generation: A Survey on Agentic RAG.* arXiv:2501.09136, 2025. https://arxiv.org/abs/2501.09136
 - Malkov, Y. A. y Yashunin, D. A. *Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs.* arXiv:1603.09320, 2016. https://arxiv.org/abs/1603.09320
 - Nussbaum, Z. et al. *Nomic Embed: Training a Reproducible Long Context Text Embedder.* arXiv:2402.01613, 2024. https://arxiv.org/abs/2402.01613
 - Ollama. *nomic-embed-text — Model page.* https://ollama.com/library/nomic-embed-text
 - pgvector. *Open-source vector similarity search for Postgres.* Repositorio oficial. https://github.com/pgvector/pgvector
+
+### Aplicaciones de LLM y RAG en educación superior
+
+- Modran, H. et al. *LLM Intelligent Agent Tutoring in Higher Education Courses using a RAG Approach.* Springer, 2024. https://link.springer.com/chapter/10.1007/978-3-031-83520-9_54
+- *Memory-Augmented Large Language Model for Enhanced Chatbot Services in University Learning Management Systems.* Applied Sciences, MDPI, 2025. https://www.mdpi.com/2076-3417/15/17/9775
+- *Retrieval Augmented Large Language Model Chatbots in Higher Education: A Study on University Open Days.* 2025. https://www.researchgate.net/publication/387786519
 
 ### Infraestructura de inferencia
 
