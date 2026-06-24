@@ -58,7 +58,9 @@ async def obtener_materia(nombre_materia: str = "") -> str:
         nombre_materia,
     )
     if not materias:
-        return "No se encontró ninguna materia con ese nombre en tu carrera."
+        return ("No se encontró ninguna materia con ese nombre en tu carrera. "
+                "Informale al alumno que no encontraste esa materia y sugerile "
+                "que verifique el nombre. No uses otras herramientas.")
 
     result = []
     for mat in materias:

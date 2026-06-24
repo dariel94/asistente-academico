@@ -40,6 +40,7 @@
   - [6.3. Evaluación de Rendimiento (Latencia y Consumo Local de Tokens)](#63-evaluación-de-rendimiento-latencia-y-consumo-local-de-tokens)
   - [6.4. Validación de Seguridad, Rate Limit y Resistencia a Inyecciones](#64-validación-de-seguridad-rate-limit-y-resistencia-a-inyecciones)
   - [6.5. Evaluación de la Memoria Conversacional Híbrida](#65-evaluación-de-la-memoria-conversacional-híbrida)
+  - [6.6. Validación Funcional: Evidencia Visual de los Requerimientos](#66-validación-funcional-evidencia-visual-de-los-requerimientos)
 - [Capítulo 7: Conclusiones y Posibles Mejoras](#capítulo-7-conclusiones-y-posibles-mejoras)
 - [Capítulo 8: Bibliografía](#capítulo-8-bibliografía)
 
@@ -2211,6 +2212,109 @@ La respuesta falla el check de contenido, consistentemente con el hallazgo anter
 La lectura integrada es que el subsistema de memoria híbrida funciona correctamente en sus componentes **estructurales** (la ventana expone el historial reciente, el umbral dispara la compresión en el punto aritméticamente correcto, el resumen se persiste y los mensajes antiguos se eliminan para acotar el contexto), pero su componente **semántico** está limitado por la capacidad del propio Llama 3.1 8B actuando como sumarizador: preserva bien lo enumerable (listas de materias, horarios, notas) y descarta las afirmaciones narrativas del usuario junto con el ruido. La consecuencia práctica es que recordar hechos singulares declarados por el alumno al inicio de una sesión larga no se cumple de forma confiable en el despliegue actual, aunque la infraestructura para sostenerlo está en su lugar.
 
 Como trabajo futuro quedan tres líneas que atacarían el problema sin tocar la aritmética del `MemoryManager`: (i) ajustar el `PROMPT_SUMARIZACION` para etiquetar estructuralmente una sección dedicada a *preferencias declaradas* y separarla de los datos consultados; (ii) mantener una tabla separada de *hechos singulares* declarados por el usuario que no se comprima, análoga a una memoria episódica; (iii) delegar la sumarización a un modelo más grande o especializado, aprovechando que la sumarización es asincrónica respecto del turno activo y por tanto su latencia adicional no es crítica.
+
+### 6.6. Validación Funcional: Evidencia Visual de los Requerimientos
+
+Las secciones 6.2 a 6.5 validaron cuantitativamente las propiedades transversales del sistema (precisión de tool calling, latencia, seguridad y memoria), asociadas en su mayoría a los requerimientos *no funcionales*. Esta sección las complementa con evidencia visual de extremo a extremo de los **requerimientos funcionales** definidos en la sección 3.1: cada captura proviene de una sesión real ejecutada sobre el entorno de referencia (Tabla 5.1) y autenticada como uno de los alumnos del dataset seedeado (María González, legajo `SIS-1001`, y Carlos López, legajo `SIS-1002`). En todas las capturas el panel lateral izquierdo muestra el perfil del alumno autenticado, lo que evidencia el perfilado persistente a lo largo de la sesión.
+
+La tabla siguiente resume la correspondencia entre cada requerimiento funcional, la herramienta MCP que lo resuelve (cuando aplica) y la figura que lo respalda:
+
+| Requerimiento funcional | Herramienta / mecanismo | Figura |
+|---|---|---|
+| RF1. Autenticación y Perfilado | Login JWT + inyección de perfil | 6.6.1, 6.6.2 |
+| RF2. Interacción en Lenguaje Natural | Clasificador de intención + streaming | 6.6.3 |
+| RF3. Consulta de Historia Académica | `obtener_historia_academica` | 6.6.4 |
+| RF4. Consulta de Materias | `obtener_materia` | 6.6.5 |
+| RF5. Consulta de Inscripciones | `obtener_inscripciones` | 6.6.6 |
+| RF6. Consulta de Materias Disponibles | `consultar_materias_disponibles` | 6.6.7 |
+| RF7. Consulta del Plan de Estudio | `obtener_plan_de_estudios` | 6.6.8 |
+| RF8. Consulta de Avance de Carrera | `obtener_materias_faltantes` | 6.6.9, 6.6.10 |
+| RF9. Búsqueda en Documentos Institucionales | `buscar_en_documentos` | 6.6.11 |
+| RF10. Gestión de Contexto Conversacional | Memoria híbrida (ventana + resumen) | 6.6.4, 6.6.10 |
+
+#### 6.6.1. Autenticación y Perfilado (RF1)
+
+El acceso al sistema requiere autenticarse con el legajo y la contraseña institucionales. Tras un login exitoso, el backend emite el token JWT y el frontend carga el perfil del alumno, que queda visible de forma permanente en el panel lateral (nombre, legajo, carrera y estado) y contextualiza todas las respuestas posteriores.
+
+![Pantalla de login del Asistente Académico con los campos de legajo y contraseña.](screenshots/login.png)
+
+*Figura 6.6.1. Pantalla de inicio de sesión: el alumno se autentica con su legajo (`SIS-1002`) y contraseña.*
+
+![Interfaz principal con el perfil del alumno cargado en el panel lateral y el mensaje de bienvenida del asistente.](screenshots/chat.png)
+
+*Figura 6.6.2. Sesión iniciada: el panel lateral muestra el perfil cargado (Carlos López, `SIS-1002`, Ingeniería en Sistemas de Información, estado Regular) y el asistente (Selene) saluda al alumno por su nombre.*
+
+#### 6.6.2. Interacción en Lenguaje Natural (RF2)
+
+El alumno formula sus consultas en lenguaje natural e informal, sin comandos ni sintaxis especial. Mientras el agente procesa el mensaje, la interfaz expone el estado de la operación en curso (en este caso, *"Analizando tu consulta..."*), reforzando la transparencia descrita en la sección 4.6.4.
+
+![Consulta en lenguaje natural escrita por el usuario con el indicador de estado "Analizando tu consulta".](screenshots/chat-processing.png)
+
+*Figura 6.6.3. Interacción en lenguaje natural: el alumno escribe una consulta libre y la interfaz muestra el indicador de estado mientras el orquestador clasifica la intención y prepara la respuesta.*
+
+#### 6.6.3. Consulta de Historia Académica (RF3)
+
+El asistente recupera la historia académica del alumno con sus materias cursadas, estados (aprobada, regularizada, desaprobada, etc.) y calificaciones.
+
+![Conversación donde el asistente devuelve el historial académico con materias, estados y notas.](screenshots/obtener_historia_academica.png)
+
+*Figura 6.6.4. Consulta de historia académica: el asistente lista las materias cursadas con su estado y, ante el pedido de seguimiento "con sus notas", reformula la lista incorporando las calificaciones (3.00, 5.00, 9.00), demostrando además la gestión de contexto conversacional (RF10).*
+
+#### 6.6.4. Consulta de Materias (RF4)
+
+El asistente responde con la información de una materia (año del plan, cuatrimestre, carga horaria y correlativas). La búsqueda tolera variaciones de tipeo: ante un nombre inexistente informa que no encontró la materia, y resuelve correctamente la consulta cuando el nombre coincide con el plan.
+
+![Conversación donde el asistente busca una materia y devuelve su carga horaria y correlativas.](screenshots/obtener_materia.png)
+
+*Figura 6.6.5. Consulta de materia: tras dos nombres que no figuran en el plan, el asistente resuelve "Bases de Datos" devolviendo cuatrimestre, año del plan, carga horaria y correlativas requeridas.*
+
+#### 6.6.5. Consulta de Inscripciones y Grilla Horaria (RF5)
+
+El asistente presenta la grilla horaria semanal del período vigente, integrando para cada comisión el día, horario, aula, sede y profesor.
+
+![Conversación donde el asistente devuelve la agenda semanal de cursadas organizada por día.](screenshots/obtener_inscripciones.png)
+
+*Figura 6.6.6. Consulta de inscripciones: el asistente arma la agenda semanal del alumno ordenada por día, con horario, comisión, aula, sede y docente de cada materia.*
+
+#### 6.6.6. Consulta de Materias Disponibles (RF6)
+
+El asistente determina qué materias puede inscribir el alumno en el próximo período, verificando automáticamente el cumplimiento de correlatividades contra su historia académica.
+
+![Conversación donde el asistente lista las materias disponibles para inscripción en el próximo cuatrimestre.](screenshots/consultar_materias_disponibles.png)
+
+*Figura 6.6.7. Consulta de materias disponibles: el asistente lista las materias habilitadas para el próximo cuatrimestre (2026-2C) según las correlativas cumplidas por el alumno.*
+
+#### 6.6.7. Consulta del Plan de Estudio (RF7)
+
+El asistente devuelve el plan de estudios completo de la carrera del alumno.
+
+![Conversación donde el asistente muestra el plan de estudios completo de la carrera.](screenshots/obtener_plan_de_estudios.png)
+
+*Figura 6.6.8. Consulta del plan de estudios: el asistente enumera las once materias que componen el plan de Ingeniería en Sistemas de Información.*
+
+#### 6.6.8. Consulta de Avance de Carrera (RF8)
+
+El asistente informa el avance del alumno en la carrera: porcentaje completado, materias aprobadas y materias faltantes para egresar.
+
+![Conversación donde el asistente informa el porcentaje de avance, materias aprobadas y pendientes.](screenshots/avance_de_carrera.png)
+
+*Figura 6.6.9. Consulta de avance de carrera: el asistente reporta el porcentaje completado del plan (54,5 %) junto con las materias aprobadas y las pendientes.*
+
+![Conversación donde el asistente lista las materias faltantes y luego las reformula en una tabla.](screenshots/obtener_materias_faltantes.png)
+
+*Figura 6.6.10. Consulta de materias faltantes: el asistente lista las materias pendientes para recibirse y, ante el pedido "en formato de tabla", reformula la respuesta como una tabla con nombre, año del plan, cuatrimestre y carga horaria, evidenciando el renderizado Markdown (sección 5.6.5) y la gestión de contexto conversacional (RF10).*
+
+#### 6.6.9. Búsqueda en Documentos Institucionales (RF9)
+
+Para las consultas sobre normativa o información institucional, el asistente recupera fragmentos relevantes del corpus documental mediante búsqueda semántica (RAG) y redacta la respuesta a partir de ellos.
+
+![Conversación donde el asistente responde una consulta institucional a partir de documentos.](screenshots/buscar_en_documentos.png)
+
+*Figura 6.6.11. Búsqueda en documentos institucionales: ante una consulta sobre la universidad, el asistente recupera fragmentos del corpus RAG y elabora la respuesta fundamentada en ellos.*
+
+#### 6.6.10. Gestión de Contexto Conversacional (RF10)
+
+La coherencia en diálogos de varios turnos no requiere una captura dedicada, ya que se manifiesta dentro de las conversaciones anteriores. En la Figura 6.6.4, el pedido de seguimiento *"con sus notas"* se resuelve sobre la lista de materias del turno previo sin que el alumno repita a qué materias se refiere; análogamente, en la Figura 6.6.10 la instrucción *"en formato de tabla"* reformula la respuesta inmediatamente anterior. Ambos casos evidencian que el `MemoryManager` (sección 5.5.3) reinyecta el contexto reciente, habilitando las referencias anafóricas que define el RF10.
 
 ---
 

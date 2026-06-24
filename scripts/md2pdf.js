@@ -63,6 +63,7 @@ async function main() {
   th, td { border: 1px solid #bbb; padding: .35em .6em; }
   th { background: #eee; }
   blockquote { border-left: 4px solid #888; margin: 1em 0; padding: .2em 1em; color: #555; background: #fafafa; }
+  img { max-width: 100%; height: auto; display: block; margin: 1em auto; border: 1px solid #ddd; border-radius: 4px; page-break-inside: avoid; }
   .mermaid { text-align: center; margin: 1.2em 0; page-break-inside: avoid; }
   .mermaid svg { max-width: 100%; height: auto; }
   a { color: #0645ad; text-decoration: none; }
